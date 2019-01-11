@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% set active_page = "players" %}
+{% block title %}Players{% endblock %}
+
+{% block content %}
+  {% if g.is_editor %}
+    <div class="btn-toolbar" role="toolbar">
+      <a class="btn btn-primary" href="/newplayer" role="button">New Player</a>
+    </div>
+  {% endif %}
+  {% if not model.player_list %}
+    There are no players.
+  {% else %}
+      <table class="table table-hover table-striped table-bordered">
+        <thead>
+          <tr>
+            {% for prop, caption in model.columns %}
+              <th scope="col" class="col-sm-auto text-center">{{ caption }}</th>
+            {% endfor %}
+
+            {% if g.is_editor %}
+              {% for name, caption in model.controls %}
+                <th scope="col" class="col-sm-auto text-center">{{ caption }}</th>
+              {% endfor %}
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for player in model.player_list %}
+          <tr>
+            {% for prop, caption in model.columns %}
+              <td class="col-sm-auto text-center">{{ player[prop] }}</td>
+            {% endfor %}
+
+            {% if g.is_editor %}
+              {% for name, caption in model.controls %}
+                <td class="col-sm-auto text-center">
+                  <a class="btn btn-dark" href="/players/{{ player['id'] }}">{{ caption }}</a>
+                </td>
+              {% endfor %}
+            {% endif %}
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+
+  {% endif %}
+{% endblock %}

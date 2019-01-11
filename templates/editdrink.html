@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% set active_page = "drinks" %}
+{% block title %}Drinks{% endblock %}
+
+
+{% block content %}
+<form class="needs-validation" novalidate action="/savedrink" method="post">
+  <div class="form-group">
+    <label for="id">ID</label>
+    <input name="id"
+           type="text"
+           class="form-control"
+           id="id"
+           value="{{ model['id'] }}"
+           readonly>
+  </div>
+  <div class="form-group">
+    <label for="name">Drink Name</label>
+    <input name="name"
+           type="text"
+           class="form-control"
+           id="name"
+           placeholder="Drink name..."
+           value="{{ model['name'] }}"
+           required>
+  </div>
+  <div class="form-group">
+    <label for="drinkVol">Alcohol %</label>
+    <input name="vol"
+           type="text"
+           class="form-control"
+           id="drinkVol"
+           placeholder="Drink volume..."
+           value="{{ model['vol'] }}"
+           required>
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<script>
+// Example starter JavaScript for disabling form submissions if there are invalid fields
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    let forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    let validation = Array.prototype.filter.call(forms, function (form) {
+      form.addEventListener('submit', function (event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
+{% endblock %}

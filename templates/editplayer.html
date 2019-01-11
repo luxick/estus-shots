@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% set active_page = "players" %}
+{% block title %}Players{% endblock %}
+
+
+{% block content %}
+<form class="needs-validation" novalidate action="/saveplayer" method="post">
+  <div class="form-group">
+    <label for="playerId">ID</label>
+    <input name="id"
+           type="text"
+           class="form-control"
+           id="playerId"
+           value="{{ model['id'] }}"
+           readonly>
+  </div>
+  <div class="form-group">
+    <label for="newPlayerRealName">Real Name</label>
+    <input name="real_name"
+           type="text"
+           class="form-control"
+           id="newPlayerRealName"
+           placeholder="Enter name..."
+           value="{{ model['real_name'] }}">
+  </div>
+  <div class="form-group">
+    <label for="newPlayerAlias">Player Alias</label>
+    <input name="alias"
+           type="text"
+           class="form-control"
+           id="newPlayerAlias"
+           placeholder="Enter alias..."
+           value="{{ model['alias'] }}"
+           required>
+  </div>
+  <div class="form-group">
+    <label for="newPlayerHexID">Hex ID</label>
+    <input name="hex_id"
+           type="text"
+           class="form-control"
+           id="newPlayerHexID"
+           placeholder="Enter Hex ID..."
+           value="{{ model['hex_id'] }}">
+  </div>
+  <div class="form-group form-check">
+    <input name="anon"
+           type="checkbox"
+           class="form-check-input"
+           id="newPlayerAnon"
+           value="True"
+           {% if model['anon'] %}
+            checked
+           {% endif %}>
+    <label class="form-check-label" for="newPlayerAnon">Anonymize (Show only player alias)</label>
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<script>
+// Example starter JavaScript for disabling form submissions if there are invalid fields
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    let forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    let validation = Array.prototype.filter.call(forms, function (form) {
+      form.addEventListener('submit', function (event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
+{% endblock %}

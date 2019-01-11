@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/static/bootstrap.css">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
+  <title>{% block title %}{% endblock %} - Estus Shots</title>
+</head>
+<body>
+  <div class="container">
+    {%  set nav_bar = [
+      ('/seasons', 'seasons', 'Seasons', 'fas fa-calendar'),
+      ('/players', 'players', 'Players', 'fas fa-users'),
+      ('/enemies', 'enemies', 'Enemies', 'fas fa-skull-crossbones'),
+      ('/drinks', 'drinks', 'Drinks', 'fas fa-beer')
+    ]-%}
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+      <ul class="nav navbar-nav mr-auto">
+      {% for href, id, caption, icon in nav_bar %}
+        <li class="nav-item{% if id == active_page %} active{% endif %}">
+          <a class="nav-link" href="{{ href|e }}">
+            <i class="{{ icon|e }}"></i> {{ caption|e }}
+          </a>
+        </li>
+      {% endfor %}
+      </ul>
+      <ul class="nav navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/logout">Logout</a>
+        </li>
+      </ul>
+    </nav>
+
+    <div>{% block content %}{% endblock %}</div>
+
+    <div>
+      {% block footer %}
+        &copy; A product of D⁵: <a href="#">Durstiger Donnerstag Digital Drinking Divison</a>.
+      {% endblock %}
+    </div>
+  </div>
+</body>
+</html>
