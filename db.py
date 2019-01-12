@@ -126,7 +126,19 @@ def load_enemies(id=None):
     return enemies
 
 
-def save_season_query(season):
+def save_enemy(enemy: models.Enemy):
+    if not enemy.id:
+        sql = 'insert into enemy values (?, ?, ?, ?)'
+        args = (None, enemy.name, enemy.boss, enemy.season_id)
+    else:
+        sql = 'update enemy ' \
+              'set name=?, boss=?, season_id=? ' \
+              'where id==?'
+        args = (enemy.name, enemy.boss, enemy.season_id)
+    return sql, args
+
+
+def save_season_query(season: models.Season):
     if not season.id:
         sql = 'insert into season values (?, ?, ?, ?, ?, ?)'
         args = (None,
@@ -156,3 +168,4 @@ def load_season(id=None):
         args = (id, )
     sql += ' order by season.start'
     return sql, args
+

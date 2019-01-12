@@ -52,6 +52,7 @@ class Enemy:
     id: int
     name: str
     boss: bool
+    season_id: int
 
     @classmethod
     def from_form(cls, form):
@@ -63,11 +64,19 @@ class Enemy:
             raise AttributeError(INVALID_STR.format('name'))
         name = str(name)
 
-        boss = form.get('boss', '')
+        boss = form.get('boss', False)
         if boss not in [True, False, 'True', 'False']:
             raise AttributeError(INVALID_STR.format('boss'))
+        boss = bool(boss)
 
-        self = cls(id=id, name=name, boss=boss)
+        season = form.get('season', None)
+        if season not in ['None', None]:
+            try:
+                season = int(season)
+            except ValueError:
+                raise AttributeError(INVALID_STR.format('boss'))
+
+        self = cls(id=id, name=name, boss=boss, season_id=season)
         return self
 
 

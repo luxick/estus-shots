@@ -213,11 +213,41 @@ def enemies():
         'columns': [
             ('id', 'ID'),
             ('name', 'Enemy Name'),
-            ('vol', 'Is Boss')
+            ('boss', 'Is Boss')
         ],
         'controls': [('edit', 'Edit')]
     }
     return render_template('enemies.html', model=model)
+
+
+@app.route('/newenemy', methods=['GET'])
+@authorize
+def new_enemy(preselect_season=None):
+    sql, args = db.load_season()
+    db_seasons = db.query_db(sql, args, cls=models.Season)
+    db_seasons = sorted(db_seasons, key=lambda s: s.code)
+
+    view_seasons = [(s.id, f'{s.code} - {s.game}') for s in db_seasons]
+    view_seasons.insert(0, (None, 'No Season'))
+    model = {
+        'boss': True,
+        'seasons': view_seasons,
+        'select_season': preselect_season
+    }
+    return render_template('editenemy.html', model=model)
+
+
+@app.route('/saveenemy', methods=['POST'])
+@authorize
+def save_enemy():
+    valid_enemy = models.Enemy.from_form(request.form)
+    sql, args = db.save_enemy(valid_enemy)
+    error = db.update_db(sql, args)
+
+    if 'continue' not in request.form:
+        return redirect('/enemies')
+    last_selection = valid_enemy.season_id
+    return new_enemy(preselect_season=last_selection)
 
 
 if __name__ == '__main__':

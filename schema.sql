@@ -47,27 +47,11 @@ create table if not exists enemy
 		constraint enemy_pk
 			primary key autoincrement,
 	name text not null,
-	boss integer not null
+	boss integer not null,
+	season_id integer,
+
+	foreign key (season_id) references season(id)
 );
 
 create unique index if not exists enemy_id_uindex
 	on enemy (id);
-
-create table if not exists season_enemy
-(
-	id integer not null
-		constraint season_enemy_pk
-			primary key autoincrement,
-	season_id integer
-		constraint season_enemy_season_id_fk
-			references season,
-	enemy_id integer
-		constraint season_enemy_enemy_id_fk
-			references enemy
-);
-
-create unique index if not exists season_enemy_id_uindex
-	on season_enemy (id);
-
-
-
