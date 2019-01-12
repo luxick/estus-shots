@@ -66,11 +66,7 @@ def logout():
 @app.route('/')
 @authorize
 def landing():
-    if 'editor' in session['role']:
-        print('editor')
-    else:
-        print('not editor')
-    return render_template('seasons.html')
+    return redirect('/seasons')
 
 
 @app.route('/seasons')
@@ -81,6 +77,7 @@ def seasons():
     model = {
         'seasons': results,
         'columns': [
+            ('code', '#'),
             ('game', 'Game'),
             ('description', 'Season Description'),
             ('start', 'Started At'),
@@ -115,6 +112,17 @@ def save_season():
     sql, args = db.save_season_query(season)
     res = db.update_db(sql, args)
     return redirect('/seasons')
+
+
+@app.route('/seasons/<id>', methods=['GET'])
+@authorize
+def season_overview(id: int):
+    sql, args = db.load_season(id)
+    db_season = db.query_db(sql, args, one=True, cls=models.Season)
+    model = {
+        'title': f'{db_season.code} {db_season.game}'
+    }
+    return render_template('seasonoverview.html', model=model)
 
 
 @app.route('/newplayer', methods=['GET'])

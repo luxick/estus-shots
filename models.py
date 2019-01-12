@@ -78,6 +78,7 @@ class Season:
     description: str
     start: datetime.date
     end: datetime.date
+    code: str
 
     @classmethod
     def from_form(cls, form):
@@ -104,5 +105,7 @@ class Season:
             except Exception:
                 raise INVALID_STR.format('end')
 
-        self = cls(id, game, description, start, end)
+        code = form.get('code', None)
+
+        self = cls(id, game, description, start, end, code)
         return self

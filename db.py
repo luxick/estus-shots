@@ -128,13 +128,23 @@ def load_enemies(id=None):
 
 def save_season_query(season):
     if not season.id:
-        sql = 'insert into season values (?, ?, ?, ?, ?)'
-        args = (None, season.game, season.description, season.start, season.end)
+        sql = 'insert into season values (?, ?, ?, ?, ?, ?)'
+        args = (None,
+                season.game,
+                season.description,
+                season.start,
+                season.end,
+                season.code)
     else:
         sql = 'update season ' \
-              'set game=?, description=?, start=?, end=? ' \
+              'set game=?, description=?, start=?, end=?, code=? ' \
               'where id==?'
-        args = (season.game, season.description, season.start, season.end, season.id)
+        args = (season.game,
+                season.description,
+                season.start,
+                season.end,
+                season.code,
+                season.id)
     return sql, args
 
 
