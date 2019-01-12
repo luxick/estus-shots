@@ -103,9 +103,11 @@ class Season:
             try:
                 end = datetime.date.fromisoformat(end)
             except Exception:
-                raise INVALID_STR.format('end')
+                raise AttributeError(INVALID_STR.format('end'))
 
         code = form.get('code', None)
+        if not code:
+            raise AttributeError(INVALID_STR.format('code'))
 
         self = cls(id, game, description, start, end, code)
         return self

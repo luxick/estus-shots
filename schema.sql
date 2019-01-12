@@ -7,7 +7,7 @@ create table if not exists season
 	description text,
 	start text,
 	end text,
-	code text
+	code text not null
 );
 
 create unique index if not exists season_id_uindex
