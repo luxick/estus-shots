@@ -2,7 +2,7 @@ import sqlite3
 import logging as log
 from flask import g
 
-import model
+import models
 
 
 DATABASE = 'es_debug.db'
@@ -18,12 +18,14 @@ def connect_db():
     return db
 
 
-def query_db(query, args=(), one=False):
-    """Runs an SQL query on an new database connection, returning the fetched rows"""
+def query_db(query, args=(), one=False, cls=None):
+    """Runs an SQL query on an new database connection, returning the fetched rv"""
     log.info(f'Running query ({query})\nwith arguments ({args})')
     cur = connect_db().execute(query, args)
     rv = cur.fetchall()
     cur.close()
+    if cls:
+        rv = [cls(**row) for row in rv]
     return (rv[0] if rv else None) if one else rv
 
 
@@ -79,7 +81,7 @@ def load_players(id=None):
         args = (id, )
     sql += ' order by player.id'
     rows = query_db(sql, args)
-    players = [model.Player(**row) for row in rows]
+    players = [models.Player(**row) for row in rows]
     return players
 
 
@@ -91,7 +93,7 @@ def load_drinks(id=None):
         args = (id, )
     sql += ' order by drink.id'
     rows = query_db(sql, args)
-    drinks = [model.Drink(**row) for row in rows]
+    drinks = [models.Drink(**row) for row in rows]
     return drinks
 
 
@@ -120,5 +122,27 @@ def load_enemies(id=None):
         args = (id, )
     sql += ' order by enemy.id'
     rows = query_db(sql, args)
-    enemies = [model.Enemy(**row) for row in rows]
+    enemies = [models.Enemy(**row) for row in rows]
     return enemies
+
+
+def save_season_query(season):
+    if not season.id:
+        sql = 'insert into season values (?, ?, ?, ?, ?)'
+        args = (None, season.game, season.description, season.start, season.end)
+    else:
+        sql = 'update season ' \
+              'set game=?, description=?, start=?, end=? ' \
+              'where id==?'
+        args = (season.game, season.description, season.start, season.end, season.id)
+    return sql, args
+
+
+def load_season(id=None):
+    sql = 'select * from season'
+    args = ()
+    if id:
+        sql += ' where season.id = ?'
+        args = (id, )
+    sql += ' order by season.start'
+    return sql, args

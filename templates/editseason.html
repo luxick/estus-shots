@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% set active_page = "seasons" %}
+{% block title %}Seasons{% endblock %}
+
+
+{% block content %}
+<form class="needs-validation" novalidate action="/saveseason" method="post">
+  <div class="form-group">
+    <label for="id">ID</label>
+    <input name="id"
+           type="text"
+           class="form-control"
+           id="id"
+           value="{{ model['id'] }}"
+           readonly>
+  </div>
+  <div class="form-group">
+    <label for="game">Game Name</label>
+    <input name="game"
+           type="text"
+           class="form-control"
+           id="game"
+           placeholder="The game name..."
+           value="{{ model['game'] }}"
+           required>
+  </div>
+  <div class="form-group">
+    <label for="description">Season Description</label>
+    <input name="description"
+           type="text"
+           class="form-control"
+           id="description"
+           placeholder="The season description..."
+           value="{{ model['description'] }}"
+           required>
+  </div>
+  <div class="form-group">
+    <label for="start">Season Start</label>
+    <input name="start"
+           type="date"
+           class="form-control"
+           id="start"
+           placeholder="YYYY-MM-DD"
+           value="{{ model['start'] }}"
+           required>
+  </div>
+  <div class="form-group">
+    <label for="end">Season End</label>
+    <input name="end"
+           type="date"
+           class="form-control"
+           id="start"
+           placeholder="Season end date..."
+           value="{{ model['end'] }}">
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<script>
+// Example starter JavaScript for disabling form submissions if there are invalid fields
+(function() {
+  'use strict';
+  window.addEventListener('load', function() {
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    let forms = document.getElementsByClassName('needs-validation');
+    // Loop over them and prevent submission
+    let validation = Array.prototype.filter.call(forms, function (form) {
+      form.addEventListener('submit', function (event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  }, false);
+})();
+</script>
+{% endblock %}

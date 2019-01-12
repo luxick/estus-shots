@@ -3,5 +3,48 @@
 {% block title %}Seasons{% endblock %}
 
 {% block content %}
-There are no seasons.
+  {% if g.is_editor %}
+    <div class="btn-toolbar" role="toolbar">
+      <a class="btn btn-primary" href="/newseason" role="button">New Season</a>
+    </div>
+  {% endif %}
+{% if not model.seasons %}
+    There are no seasons.
+  {% else %}
+      <table class="table table-hover table-striped table-bordered">
+        <thead>
+          <tr>
+            {% for prop, caption in model.columns %}
+              <th scope="col" class="col-sm-auto text-center">{{ caption }}</th>
+            {% endfor %}
+
+            <th scope="col" class="col-sm-auto text-center"></th>
+
+            {% if g.is_editor %}
+              <th scope="col" class="col-sm-auto text-center">Editor</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in model.seasons %}
+          <tr>
+            {% for prop, caption in model.columns %}
+              <td class="col-sm-auto text-center">{{ item[prop] }}</td>
+            {% endfor %}
+
+              <td class="col-sm-auto text-center">
+                <a class="btn btn-dark" href="/seasons/{{ item.id }}">Show</a>
+              </td>
+
+            {% if g.is_editor %}
+              <td class="col-sm-auto text-center">
+                <a class="btn btn-dark" href="/seasons/edit/{{ item.id }}">Edit</a>
+              </td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+
+  {% endif %}
 {% endblock %}

@@ -2,7 +2,7 @@ import functools
 from flask import Flask, g, render_template, request, redirect, session
 
 import db
-import model
+import models
 
 
 app = Flask(__name__)
@@ -76,7 +76,45 @@ def landing():
 @app.route('/seasons')
 @authorize
 def seasons():
-    return render_template('seasons.html')
+    sql, args = db.load_season()
+    results = db. query_db(sql, args, cls=models.Season)
+    model = {
+        'seasons': results,
+        'columns': [
+            ('game', 'Game'),
+            ('description', 'Season Description'),
+            ('start', 'Started At'),
+            ('end', 'Ended At')
+        ]
+    }
+    return render_template('seasons.html', model=model)
+
+
+@app.route('/newseason', methods=['GET'])
+@authorize
+def new_season():
+    return render_template('editseason.html', model={})
+
+
+@app.route('/seasons/edit/<id>')
+@authorize
+def edit_season(id: int):
+    sql, args = db.load_season(id)
+    loaded = db.query_db(sql, args, one=True, cls=models.Season)
+    return render_template('editseason.html', model=loaded)
+
+
+@app.route('/saveseason', methods=['POST'])
+@authorize
+def save_season():
+    try:
+        season = models.Season.from_form(request.form)
+    except AttributeError as err:
+        print(err)
+        return render_template('editseason.html', model={})
+    sql, args = db.save_season_query(season)
+    res = db.update_db(sql, args)
+    return redirect('/seasons')
 
 
 @app.route('/newplayer', methods=['GET'])
@@ -87,9 +125,9 @@ def new_player():
 
 @app.route('/saveplayer', methods=['POST'])
 @authorize
-def update_player():
+def save_player():
     data = request.form
-    player = model.Player(
+    player = models.Player(
         id=data.get('id', None),
         real_name=data['real_name'],
         alias=data['alias'],
@@ -153,7 +191,7 @@ def new_drink():
 @app.route('/savedrink', methods=['POST'])
 @authorize
 def save_drink():
-    drink = model.Drink.from_form(request.form)
+    drink = models.Drink.from_form(request.form)
     res = db.save_drink(drink)
     return redirect('/drinks')
 
