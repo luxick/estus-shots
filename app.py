@@ -1,5 +1,7 @@
 import functools
 import logging
+import os
+
 from flask import Flask, g, render_template, request, redirect, session
 
 import db
@@ -7,6 +9,9 @@ import models
 
 
 logging.basicConfig(filename='estus-shots.log', level=logging.DEBUG)
+
+logging.info(f'Starting with working dir: {os.getcwd()}')
+logging.info(f'App file location: {os.path.abspath(__file__)}')
 
 app = Flask(__name__)
 
