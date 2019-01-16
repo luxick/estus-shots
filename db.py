@@ -5,7 +5,7 @@ from flask import g
 import models
 
 
-DATABASE = 'es_debug.db'
+DATABASE = 'database/es_debug.db'
 
 
 def connect_db():
