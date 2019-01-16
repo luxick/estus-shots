@@ -12,6 +12,7 @@ def connect_db():
     """Create a new sqlite3 connection and register it in 'g._database'"""
     db = getattr(g, '_database', None)
     if db is None:
+        log.info(f'Connecting {DATABASE}')
         db = g._database = sqlite3.connect(DATABASE)
 
     db.row_factory = sqlite3.Row
@@ -20,7 +21,7 @@ def connect_db():
 
 def query_db(query, args=(), one=False, cls=None):
     """Runs an SQL query on an new database connection, returning the fetched rv"""
-    log.info(f'Running query ({query})\nwith arguments ({args})')
+    log.info(f'Running query ({query}) with arguments ({args})')
     cur = connect_db().execute(query, args)
     rv = cur.fetchall()
     cur.close()
@@ -39,7 +40,8 @@ def update_db(query, args=()):
             con.cursor().execute(query, args)
         except sqlite3.Error as err:
             return err
-        con.commit()
+        else:
+            con.commit()
     return False
 
 

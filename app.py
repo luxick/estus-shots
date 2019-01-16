@@ -1,9 +1,12 @@
 import functools
+import logging
 from flask import Flask, g, render_template, request, redirect, session
 
 import db
 import models
 
+
+logging.basicConfig(filename='estus-shots.log', level=logging.DEBUG)
 
 app = Flask(__name__)
 
