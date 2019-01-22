@@ -6,12 +6,13 @@ from flask import Flask, g, render_template, request, redirect, session
 
 import db
 import models
+import const
 
 
-logging.basicConfig(filename='estus-shots.log', level=logging.DEBUG)
+logging.basicConfig(filename=const.LOG_PATH, level=logging.DEBUG)
 
-logging.info(f'Starting with working dir: {os.getcwd()}')
-logging.info(f'App file location: {os.path.abspath(__file__)}')
+logging.info(f'Starting in working dir: {os.getcwd()}')
+logging.info(f'App base path: {const.BASE_PATH}')
 
 app = Flask(__name__)
 
@@ -127,8 +128,15 @@ def save_season():
 def season_overview(id: int):
     sql, args = db.load_season(id)
     db_season = db.query_db(sql, args, one=True, cls=models.Season)
+    infos = {
+        'Number': db_season.code,
+        'Game': db_season.game,
+        'Start Date': db_season.start,
+        'End Date': db_season.end if db_season.end else 'Ongoing'
+    }
     model = {
-        'title': f'{db_season.code} {db_season.game}'
+        'title': f'{db_season.code} {db_season.game}',
+        'season_info': infos
     }
     return render_template('seasonoverview.html', model=model)
 

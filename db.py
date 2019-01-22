@@ -3,17 +3,15 @@ import logging as log
 from flask import g
 
 import models
-
-
-DATABASE = 'database/es_debug.db'
+import const
 
 
 def connect_db():
     """Create a new sqlite3 connection and register it in 'g._database'"""
     db = getattr(g, '_database', None)
     if db is None:
-        log.info(f'Connecting {DATABASE}')
-        db = g._database = sqlite3.connect(DATABASE)
+        log.info(f'Connecting {const.DATABASE_NAME}')
+        db = g._database = sqlite3.connect(const.DATABASE_PATH)
 
     db.row_factory = sqlite3.Row
     return db
