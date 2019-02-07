@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% set active_page = "drinks" %}
-{% block title %}Drinks{% endblock %}
+{% block title %}Drinks {{ super() }}{% endblock %}
 
-{% block content %}
+{% block page %}
   {% if g.is_editor %}
     <div class="btn-toolbar" role="toolbar">
-      <a class="btn btn-primary" href="/newdrink" role="button">New Drink</a>
+      <a class="btn btn-primary" href="{{ url_for('new_drink') }}" role="button">New Drink</a>
     </div>
   {% endif %}
 {% if not model.drinks %}
@@ -19,9 +19,7 @@
             {% endfor %}
 
             {% if g.is_editor %}
-              {% for id, caption in model.controls %}
-                <th scope="col" class="col-sm-auto text-center">{{ caption }}</th>
-              {% endfor %}
+              <th scope="col" class="col-sm-auto text-center"></th>
             {% endif %}
           </tr>
         </thead>
@@ -33,16 +31,11 @@
             {% endfor %}
 
             {% if g.is_editor %}
-              {% for name, caption in model.controls %}
-                <td class="col-sm-auto text-center">
-                  <a class="btn btn-dark"
-                     href="{% if name == 'edit'%}
-                            /drinks/{{ drink.id }}
-                           {% endif %}">
-                    {{ caption }}
-                  </a>
-                </td>
-              {% endfor %}
+              <td class="col-sm-auto text-center">
+                <a class="btn btn-dark" href="{{ url_for('drink_edit', drink_id = drink.id) }}">
+                  <span class="fas fa-pencil-alt"></span>
+                </a>
+              </td>
             {% endif %}
           </tr>
         {% endfor %}

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% set active_page = "players" %}
-{% block title %}Players{% endblock %}
+{% block title %}Players {{ super() }}{% endblock %}
 
-{% block content %}
+{% block page %}
   {% if g.is_editor %}
     <div class="btn-toolbar" role="toolbar">
-      <a class="btn btn-primary" href="/newplayer" role="button">New Player</a>
+      <a class="btn btn-primary" href="{{ url_for('player_new') }}" role="button">New Player</a>
     </div>
   {% endif %}
   {% if not model.player_list %}
@@ -19,9 +19,7 @@
             {% endfor %}
 
             {% if g.is_editor %}
-              {% for name, caption in model.controls %}
-                <th scope="col" class="col-sm-auto text-center">{{ caption }}</th>
-              {% endfor %}
+              <th scope="col" class="col-sm-auto text-center">Edit</th>
             {% endif %}
           </tr>
         </thead>
@@ -33,11 +31,11 @@
             {% endfor %}
 
             {% if g.is_editor %}
-              {% for name, caption in model.controls %}
-                <td class="col-sm-auto text-center">
-                  <a class="btn btn-dark" href="/players/{{ player['id'] }}">{{ caption }}</a>
-                </td>
-              {% endfor %}
+              <td class="col-sm-auto text-center">
+                <a class="btn btn-dark" href="{{ url_for('player_edit', player_id = player.id) }}">
+                  <span class="fas fa-pencil-alt"></span>
+                </a>
+              </td>
             {% endif %}
           </tr>
         {% endfor %}

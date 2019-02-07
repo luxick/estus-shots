@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% set active_page = "seasons" %}
-{% block title %}Seasons{% endblock %}
+{% block title %}Seasons {{ super() }}{% endblock %}
 
-{% block content %}
+{% block page %}
   {% if g.is_editor %}
     <div class="btn-toolbar" role="toolbar">
-      <a class="btn btn-primary" href="/newseason" role="button">New Season</a>
+      <a class="btn btn-primary" href="/seasons/new" role="button"><span class="fas fa-plus"></span> Season</a>
     </div>
   {% endif %}
 {% if not model.seasons %}
@@ -18,9 +18,11 @@
               <th scope="col" class="col-sm-auto text-center">{{ caption }}</th>
             {% endfor %}
 
-            <th scope="col" class="col-sm-auto text-center"></th>
+            {# Show #}
+            <th scope="col" class="col-sm-auto text-center">View</th>
 
             {% if g.is_editor %}
+              {# Edit #}
               <th scope="col" class="col-sm-auto text-center">Editor</th>
             {% endif %}
           </tr>
@@ -33,12 +35,16 @@
             {% endfor %}
 
               <td class="col-sm-auto text-center">
-                <a class="btn btn-dark" href="/seasons/{{ item.id }}">Show</a>
+                <a class="btn btn-dark" href="/seasons/{{ item.id }}"><span class="fas fa-eye"></span></a>
               </td>
 
             {% if g.is_editor %}
               <td class="col-sm-auto text-center">
-                <a class="btn btn-dark" href="/seasons/edit/{{ item.id }}">Edit</a>
+                <a class="btn btn-dark" href="/seasons/{{ item.id }}/edit"><span class="fas fa-pencil-alt"></span></a>
+
+                <a class="btn btn-dark" href="/seasons/{{ item.id }}/new">
+                  <span class="fas fa-plus"></span> Episode
+                </a>
               </td>
             {% endif %}
           </tr>

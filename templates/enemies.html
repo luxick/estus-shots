@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 {% set active_page = "enemies" %}
-{% block title %}Enemies{% endblock %}
+{% block title %}Enemies {{ super() }}{% endblock %}
 
-{% block content %}
+{% block page %}
   {% if g.is_editor %}
     <div class="btn-toolbar" role="toolbar">
-      <a class="btn btn-primary" href="/newenemy" role="button">New Enemy</a>
+      <a class="btn btn-primary" href="{{ url_for('enemy_new') }}" role="button">
+        <span class="fas fa-plus"></span> Enemy
+      </a>
     </div>
   {% endif %}
 {% if not model.enemies %}
@@ -14,35 +16,32 @@
       <table class="table table-hover table-striped table-bordered">
         <thead>
           <tr>
-            {% for prop, caption in model.columns %}
-              <th scope="col" class="col-sm-auto text-center">{{ caption }}</th>
-            {% endfor %}
+            <th scope="col" class="col-sm-auto text-center">ID</th>
+            <th scope="col" class="col-sm-auto text-center">Name</th>
+            <th scope="col" class="col-sm-auto text-center">Boss Enemy</th>
 
             {% if g.is_editor %}
-              {% for id, caption in model.controls %}
-                <th scope="col" class="col-sm-auto text-center">{{ caption }}</th>
-              {% endfor %}
+              <th scope="col" class="col-sm-auto text-center">Editor</th>
             {% endif %}
           </tr>
         </thead>
         <tbody>
           {% for item in model.enemies %}
           <tr>
-            {% for prop, caption in model.columns %}
-              <td class="col-sm-auto text-center">{{ item[prop] }}</td>
-            {% endfor %}
+            <td class="col-sm-auto text-center">{{ item.id }}</td>
+            <td class="col-sm-auto text-center">{{ item.name }}</td>
+            <td class="col-sm-auto text-center">
+              {% if item.boss %}
+                <span class="fas fa-check"></span>
+              {% endif %}
+            </td>
 
             {% if g.is_editor %}
-              {% for name, caption in model.controls %}
-                <td class="col-sm-auto text-center">
-                  <a class="btn btn-dark"
-                     href="{% if name == 'edit'%}
-                            /enemies/{{ item.id }}
-                           {% endif %}">
-                    {{ caption }}
-                  </a>
-                </td>
-              {% endfor %}
+              <td class="col-sm-auto text-center">
+                <a class="btn btn-dark" href="{{ url_for('enemy_edit', enemy_id = item.id) }}">
+                  <span class="fas fa-pencil-alt"></span>
+                </a>
+              </td>
             {% endif %}
           </tr>
         {% endfor %}

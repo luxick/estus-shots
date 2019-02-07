@@ -3,8 +3,10 @@ import logging
 import os
 
 from flask import Flask, g, render_template, request, redirect, session
+from flask_bootstrap import Bootstrap
 
 import db
+import forms
 import models
 import const
 
@@ -14,7 +16,14 @@ logging.basicConfig(filename=const.LOG_PATH, level=logging.DEBUG)
 logging.info(f'Starting in working dir: {os.getcwd()}')
 logging.info(f'App base path: {const.BASE_PATH}')
 
-app = Flask(__name__)
+
+def create_app():
+    app = Flask(__name__)
+    Bootstrap(app)
+    return app
+
+
+app = create_app()
 
 app.secret_key = 'THIS IS A TEST KEY'
 
@@ -80,7 +89,7 @@ def landing():
 
 @app.route('/seasons')
 @authorize
-def seasons():
+def season_list():
     sql, args = db.load_season()
     results = db. query_db(sql, args, cls=models.Season)
     model = {
@@ -96,23 +105,23 @@ def seasons():
     return render_template('seasons.html', model=model)
 
 
-@app.route('/newseason', methods=['GET'])
+@app.route('/seasons/new', methods=['GET'])
 @authorize
-def new_season():
+def season_new():
     return render_template('editseason.html', model={})
 
 
-@app.route('/seasons/edit/<id>')
+@app.route('/seasons/<id>/edit')
 @authorize
-def edit_season(id: int):
+def season_edit(id: int):
     sql, args = db.load_season(id)
     loaded = db.query_db(sql, args, one=True, cls=models.Season)
     return render_template('editseason.html', model=loaded)
 
 
-@app.route('/saveseason', methods=['POST'])
+@app.route('/seasons/save', methods=['POST'])
 @authorize
-def save_season():
+def season_save():
     try:
         season = models.Season.from_form(request.form)
     except AttributeError as err:
@@ -123,10 +132,10 @@ def save_season():
     return redirect('/seasons')
 
 
-@app.route('/seasons/<id>', methods=['GET'])
+@app.route('/seasons/<season_id>', methods=['GET'])
 @authorize
-def season_overview(id: int):
-    sql, args = db.load_season(id)
+def season_overview(season_id: int):
+    sql, args = db.load_season(season_id)
     db_season = db.query_db(sql, args, one=True, cls=models.Season)
     infos = {
         'Number': db_season.code,
@@ -141,54 +150,109 @@ def season_overview(id: int):
     return render_template('seasonoverview.html', model=model)
 
 
-@app.route('/newplayer', methods=['GET'])
+@app.route('/seasons/<season_id>/episodes', methods=['GET'])
 @authorize
-def new_player():
-    return render_template('editplayer.html', model={})
+def episode_list(season_id: int):
+    sql, args = db.load_season(season_id)
+    db_season = db.query_db(sql, args, one=True, cls=models.Season)
+
+    model = {
+        'season_id': season_id,
+        'season_code': db_season.code
+    }
+    return render_template('episodelist.html', model=model)
 
 
-@app.route('/saveplayer', methods=['POST'])
+@app.route('/seasons/<season_id>/new', methods=['GET'])
 @authorize
-def save_player():
-    data = request.form
-    player = models.Player(
-        id=data.get('id', None),
-        real_name=data['real_name'],
-        alias=data['alias'],
-        hex_id=data['hex_id'],
-        anon=data.get('anon', False))
-    res = db.save_player(player)
-    return redirect('/players')
+def episode_new(season_id: int):
+    model = models.GenericFormModel(
+        page_title='New Episode',
+        form_title='Create New Episode',
+        post_url='/episodes/save')
+
+    form = forms.EpisodeForm(request.form)
+    form.season_id.data = season_id
+    return render_template('generic_form.html', model=model, form=form)
+
+
+@app.route('/episodes/save', methods=['POST'])
+@authorize
+def episode_save():
+    form = forms.EpisodeForm(request.form)
+    val = form.validate()
+    return render_template('editepisode.html', form=form)
+
+
+@app.route('/players/new')
+@authorize
+def player_new():
+    form = forms.PlayerForm()
+    model = models.GenericFormModel(
+        page_title='Players',
+        form_title='Create a new Player',
+        post_url='/players/edit/null'
+    )
+    return render_template('generic_form.html', model=model, form=form)
+
+
+@app.route('/players/edit/<player_id>', methods=['GET', 'POST'])
+@authorize
+def player_edit(player_id: int):
+    model = models.GenericFormModel(
+        page_title='Players',
+        form_title=f'Edit Player',
+        post_url=f'/players/edit/{player_id}'
+    )
+    # Edit Existing Player
+    if request.method == 'GET':
+        sql, args = db.load_players(player_id)
+        player = db.query_db(sql, args, one=True, cls=models.Player)
+
+        form = forms.PlayerForm()
+        form.player_id.data = player.id
+        form.anonymize.data = player.anon
+        form.real_name.data = player.real_name
+        form.alias.data = player.alias
+        form.hex_id.data = player.hex_id
+
+        model.form_title = f'Edit Player "{player.name}"'
+        return render_template('generic_form.html', model=model, form=form)
+
+    # Save POSTed data
+    else:
+        form = forms.PlayerForm()
+        if form.validate_on_submit():
+            player = models.Player.from_form(form)
+            res = db.save_player(player)
+            return redirect('/players')
+
+        model.form_title = 'Incorrect Data'
+        return render_template('generic_form.html', model=model, form=form)
 
 
 @app.route('/players')
 @authorize
-def players():
-    loaded = db.load_players()
+def player_list():
+    sql, args = db.load_players()
+    players = db.query_db(sql, args, cls=models.Player)
     model = {
-        'player_list': loaded,
+        'player_list': players,
         'columns': [('id', 'ID'),
                     ('name', 'Player Name'),
                     ('alias', 'Alias'),
-                    ('hex_id', 'Hex ID')],
-        'controls': [('edit', 'Edit')]
+                    ('hex_id', 'Hex ID')]
     }
     return render_template('players.html', model=model)
 
 
-@app.route('/players/<id>', methods=['GET'])
-@authorize
-def edit_player(id: int):
-    loaded = db.load_players(id)[0]
-    return render_template('editplayer.html', model=loaded)
-
-
 @app.route('/drinks')
 @authorize
-def drinks():
-    loaded = db.load_drinks()
+def drink_list():
+    sql, args = db.load_drinks()
+    drinks = db.query_db(sql, args, cls=models.Drink)
     model = {
-        'drinks': loaded,
+        'drinks': drinks,
         'columns': [
             ('id', 'ID'),
             ('name', 'Drink Name'),
@@ -199,71 +263,123 @@ def drinks():
     return render_template('drinks.html', model=model)
 
 
-@app.route('/drinks/<id>', methods=['GET'])
+@app.route('/drinks/<drink_id>/edit', methods=['GET'])
 @authorize
-def show_drink(id: int):
-    loaded = db.load_drinks(id)[0]
-    return render_template('editdrink.html', model=loaded)
+def drink_edit(drink_id: int):
+    sql, args = db.load_drinks(drink_id)
+    drink = db.query_db(sql, args, one=True, cls=models.Drink)
+
+    form = forms.DrinkForm()
+    form.drink_id.data = drink.id
+    form.name.data = drink.name
+    form.vol.data = drink.vol
+
+    model = models.GenericFormModel(
+        page_title='Edit Drink',
+        form_title=f'Edit Drink "{drink.name}"',
+        post_url='/drinks/save'
+    )
+
+    return render_template('generic_form.html', model=model, form=form)
 
 
-@app.route('/newdrink', methods=['GET'])
+@app.route('/drinks/new', methods=['GET'])
 @authorize
 def new_drink():
-    return render_template('editdrink.html', model={})
+    form = forms.DrinkForm()
+
+    model = models.GenericFormModel(
+        page_title='New Drink',
+        form_title=f'Create a new Drink',
+        post_url='/drinks/save'
+    )
+    return render_template('generic_form.html', model=model, form=form)
 
 
-@app.route('/savedrink', methods=['POST'])
+@app.route('/drinks/save', methods=['POST'])
 @authorize
-def save_drink():
-    drink = models.Drink.from_form(request.form)
-    res = db.save_drink(drink)
-    return redirect('/drinks')
+def drink_save():
+    form = forms.DrinkForm()
+    if form.validate_on_submit():
+        drink = models.Drink.from_form(form)
+        res = db.save_drink(drink)
+        return redirect('/drinks')
+
+    model = models.GenericFormModel(
+        page_title='Drinks',
+        form_title='Edit Drink',
+        post_url='/drinks/save'
+    )
+    return render_template('generic_form.html', model=model, form=form)
 
 
 @app.route('/enemies')
 @authorize
-def enemies():
-    loaded = db.load_enemies()
-    model = {
-        'enemies': loaded,
-        'columns': [
-            ('id', 'ID'),
-            ('name', 'Enemy Name'),
-            ('boss', 'Is Boss')
-        ],
-        'controls': [('edit', 'Edit')]
-    }
+def enemy_list():
+    sql, args = db.load_enemies()
+    enemies = db.query_db(sql, args, cls=models.Enemy)
+    model = {'enemies': enemies}
     return render_template('enemies.html', model=model)
 
 
-@app.route('/newenemy', methods=['GET'])
+@app.route('/enemies/new', methods=['GET'])
 @authorize
-def new_enemy(preselect_season=None):
+def enemy_new(preselect_season=None):
     sql, args = db.load_season()
-    db_seasons = db.query_db(sql, args, cls=models.Season)
-    db_seasons = sorted(db_seasons, key=lambda s: s.code)
+    seasons = db.query_db(sql, args, cls=models.Season)
+    seasons = sorted(seasons, key=lambda s: s.code)
 
-    view_seasons = [(s.id, f'{s.code} - {s.game}') for s in db_seasons]
-    view_seasons.insert(0, (None, 'No Season'))
-    model = {
-        'boss': True,
-        'seasons': view_seasons,
-        'select_season': preselect_season
-    }
-    return render_template('editenemy.html', model=model)
+    form = forms.EnemyForm()
+
+    if preselect_season:
+        form.season_id.default = preselect_season
+
+    model = models.GenericFormModel(
+        page_title='Enemies',
+        form_title='Create a new Enemy',
+        post_url=f'/enemies/edit/null'
+    )
+    return render_template('generic_form.html', model=model, form=form)
 
 
-@app.route('/saveenemy', methods=['POST'])
+@app.route('/enemies/edit/<enemy_id>', methods=['GET', 'POST'])
 @authorize
-def save_enemy():
-    valid_enemy = models.Enemy.from_form(request.form)
-    sql, args = db.save_enemy(valid_enemy)
-    error = db.update_db(sql, args)
+def enemy_edit(enemy_id: int):
+    model = models.GenericFormModel(
+        page_title='Enemies',
+        form_title='Edit Enemy',
+        post_url=f'/enemies/edit/{enemy_id}'
+    )
 
-    if 'continue' not in request.form:
-        return redirect('/enemies')
-    last_selection = valid_enemy.season_id
-    return new_enemy(preselect_season=last_selection)
+    if request.method == 'GET':
+        sql, args = db.load_season()
+        seasons = db.query_db(sql, args, cls=models.Season)
+
+        sql, args = db.load_enemies(enemy_id)
+        enemy = db.query_db(sql, args, one=True, cls=models.Enemy)
+
+        form = forms.EnemyForm()
+        form.season_id.data = enemy.season_id if enemy.season_id else -1
+        form.name.data = enemy.name
+        form.is_boss.data = enemy.boss
+        form.enemy_id.data = enemy_id
+
+        model.form_title = f'Edit Enemy "{enemy.name}"'
+        return render_template('generic_form.html', model=model, form=form)
+    else:
+        form = forms.EnemyForm()
+        if form.validate_on_submit():
+            enemy = models.Enemy.from_form(form)
+            sql, args = db.save_enemy(enemy)
+            errors = db.update_db(sql, args)
+
+            if form.submit_continue_button.data:
+                form.name.data = None
+                return enemy_new(preselect_season=enemy.season_id)
+            return redirect('/enemies')
+
+        model.form_title = 'Incorrect Data'
+        return render_template('generic_form.html', model=model, form=form)
 
 
 if __name__ == '__main__':

@@ -1,10 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% set active_page = model.active_page %}
+{% block title %}{{ model.page_title }} {{ super() }}{% endblock %}
 
-</body>
-</html>
+{% block page %}
+  <div class="text-center">
+    <h1>{{ model.form_title }}</h1>
+    <form action="{{ model.post_url }}" method="post">
+      {{ wtf.quick_form(form,  button_map={'submit_button': 'primary'}, form_type='horizontal', horizontal_columns=('lg', 2, 10)) }}
+    </form>
+  </div>
+{% endblock %}

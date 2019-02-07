@@ -1,25 +1,38 @@
 import datetime
 from dataclasses import dataclass
 
+import forms
+
 INVALID_STR = 'Form entry "{}" is invalid'
+
+
+@dataclass
+class GenericFormModel:
+    page_title: str
+    form_title: str
+    post_url: str
 
 
 @dataclass
 class Player:
     id: int
     real_name: str
-    name: str
     alias: str
     hex_id: str
     anon: bool = False
 
-    def __init__(self, real_name, alias, hex_id, anon=False, id=None):
-        self.real_name = str(real_name)
-        self.name = str(real_name) if not anon else alias
-        self.hex_id = str(hex_id)
-        self.alias = str(alias)
-        self.anon = bool(anon)
-        self.id = id
+    @property
+    def name(self) -> str:
+        return self.real_name if self.real_name and not self.anon else self.alias
+
+    @classmethod
+    def from_form(cls, form: forms.PlayerForm):
+        id = int(form.player_id.data) if form.player_id.data else None
+        real_name = str(form.real_name.data) if form.real_name.data else None
+        alias = str(form.alias.data)
+        hex_id = str(form.hex_id.data) if form.hex_id.data else None
+        anon = bool(form.anonymize.data)
+        return cls(id=id, real_name=real_name, alias=alias, hex_id=hex_id, anon=anon)
 
 
 @dataclass
@@ -29,19 +42,10 @@ class Drink:
     vol: float
 
     @classmethod
-    def from_form(cls, form):
-        id = form.get('id', None)
-        id = int(id) if id else None
-
-        name = form.get('name', None)
-        if not name:
-            raise AttributeError('Form data contains no field "name"')
-        name = str(name)
-
-        vol = form.get('vol', None)
-        if not vol:
-            raise AttributeError('Form data contains no field "vol"')
-        vol = float(vol)
+    def from_form(cls, form: forms.DrinkForm):
+        id = int(form.drink_id.data) if form.drink_id.data else None
+        name = str(form.name.data)
+        vol = float(form.vol.data)
 
         self = cls(id=id, name=name, vol=vol)
         return self
@@ -55,26 +59,11 @@ class Enemy:
     season_id: int
 
     @classmethod
-    def from_form(cls, form):
-        id = form.get('id', None)
-        id = int(id) if id else None
-
-        name = form.get('name', None)
-        if not name:
-            raise AttributeError(INVALID_STR.format('name'))
-        name = str(name)
-
-        boss = form.get('boss', False)
-        if boss not in [True, False, 'True', 'False']:
-            raise AttributeError(INVALID_STR.format('boss'))
-        boss = bool(boss)
-
-        season = form.get('season', None)
-        if season not in ['None', None]:
-            try:
-                season = int(season)
-            except ValueError:
-                raise AttributeError(INVALID_STR.format('boss'))
+    def from_form(cls, form: forms.EnemyForm):
+        id = int(form.enemy_id.data) if form.enemy_id.data else None
+        name = str(form.name.data)
+        boss = bool(form.is_boss.data)
+        season = int(form.season_id.data)
 
         self = cls(id=id, name=name, boss=boss, season_id=season)
         return self

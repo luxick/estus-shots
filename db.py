@@ -80,9 +80,7 @@ def load_players(id=None):
         sql += ' where player.id = ?'
         args = (id, )
     sql += ' order by player.id'
-    rows = query_db(sql, args)
-    players = [models.Player(**row) for row in rows]
-    return players
+    return sql, args
 
 
 def load_drinks(id=None):
@@ -92,9 +90,7 @@ def load_drinks(id=None):
         sql += ' where drink.id = ?'
         args = (id, )
     sql += ' order by drink.id'
-    rows = query_db(sql, args)
-    drinks = [models.Drink(**row) for row in rows]
-    return drinks
+    return sql, args
 
 
 def save_drink_query(drink):
@@ -121,9 +117,7 @@ def load_enemies(id=None):
         sql += ' where enemy.id = ?'
         args = (id, )
     sql += ' order by enemy.id'
-    rows = query_db(sql, args)
-    enemies = [models.Enemy(**row) for row in rows]
-    return enemies
+    return sql, args
 
 
 def save_enemy(enemy: models.Enemy):
@@ -134,7 +128,7 @@ def save_enemy(enemy: models.Enemy):
         sql = 'update enemy ' \
               'set name=?, boss=?, season_id=? ' \
               'where id==?'
-        args = (enemy.name, enemy.boss, enemy.season_id)
+        args = (enemy.name, enemy.boss, enemy.season_id, enemy.id)
     return sql, args
 
 
@@ -168,4 +162,3 @@ def load_season(id=None):
         args = (id, )
     sql += ' order by season.start'
     return sql, args
-

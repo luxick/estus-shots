@@ -1,18 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+{% extends "bootstrap/base.html" %}
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="/static/bootstrap.css">
-    <link rel="stylesheet" href="/static/custom.css">
+{% block title %}Estus Shots{% endblock %}
 
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
-  <title>Login - Estus Shots</title>
-</head>
-<body>
+{% block styles %}
+  {{ super() }}
+  <link rel="stylesheet" href="/static/custom.css">
+{% endblock %}
+
+{% block content %}
+
   <div class="container vertical-center">
     <div class="card text-center mx-auto" style="width: 15rem">
       <div class="card-header">Login</div>
@@ -27,5 +23,5 @@
       </div>
     </div>
   </div>
-</body>
-</html>
+
+{% endblock %}
