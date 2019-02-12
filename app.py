@@ -8,14 +8,12 @@ from flask_bootstrap import Bootstrap
 import db
 import forms
 import models
-import const
 from config import Config
 
 
-logging.basicConfig(filename=const.LOG_PATH, level=logging.DEBUG)
+logging.basicConfig(filename=Config.LOG_PATH, level=logging.DEBUG)
 
 logging.info(f"Starting in working dir: {os.getcwd()}")
-logging.info(f"App base path: {const.BASE_PATH}")
 
 
 def create_app():
