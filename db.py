@@ -8,9 +8,9 @@ import const
 
 def connect_db():
     """Create a new sqlite3 connection and register it in 'g._database'"""
-    db = getattr(g, '_database', None)
+    db = getattr(g, "_database", None)
     if db is None:
-        log.info(f'Connecting {const.DATABASE_NAME}')
+        log.info(f"Connecting {const.DATABASE_NAME}")
         db = g._database = sqlite3.connect(const.DATABASE_PATH)
 
     db.row_factory = sqlite3.Row
@@ -19,7 +19,7 @@ def connect_db():
 
 def query_db(query, args=(), one=False, cls=None):
     """Runs an SQL query on an new database connection, returning the fetched rv"""
-    log.info(f'Running query ({query}) with arguments ({args})')
+    log.info(f"Running query ({query}) with arguments ({args})")
     cur = connect_db().execute(query, args)
     rv = cur.fetchall()
     cur.close()
@@ -45,25 +45,25 @@ def update_db(query, args=()):
 
 def init_db():
     """Initialize the database from the 'schema.sql' script file"""
-    file_name = 'schema.sql'
+    file_name = "schema.sql"
     print(f'Creating database from file: "{file_name}"')
     with connect_db() as conn:
-        with open(file_name, 'r') as f:
+        with open(file_name, "r") as f:
             try:
                 conn.cursor().executescript(f.read())
             except sqlite3.OperationalError as err:
-                log.error(f'Cannot create database: {err}')
+                log.error(f"Cannot create database: {err}")
         conn.commit()
 
 
 def save_player_query(player):
     if not player.id:
-        sql = 'insert into player values (?, ?, ?, ?, ?)'
+        sql = "insert into player values (?, ?, ?, ?, ?)"
         args = (None, player.real_name, player.alias, player.hex_id, player.anon)
     else:
-        sql = 'update player ' \
-              'set real_name=?, alias=?, hex_id=?, anon=? ' \
-              'where id==?'
+        sql = (
+            "update player " "set real_name=?, alias=?, hex_id=?, anon=? " "where id==?"
+        )
         args = (player.real_name, player.alias, player.hex_id, player.anon, player.id)
     return sql, args
 
@@ -74,33 +74,31 @@ def save_player(player):
 
 
 def load_players(id=None):
-    sql = 'select * from player'
+    sql = "select * from player"
     args = ()
     if id:
-        sql += ' where player.id = ?'
-        args = (id, )
-    sql += ' order by player.id'
+        sql += " where player.id = ?"
+        args = (id,)
+    sql += " order by player.id"
     return sql, args
 
 
 def load_drinks(id=None):
-    sql = 'select * from drink'
+    sql = "select * from drink"
     args = ()
     if id:
-        sql += ' where drink.id = ?'
-        args = (id, )
-    sql += ' order by drink.id'
+        sql += " where drink.id = ?"
+        args = (id,)
+    sql += " order by drink.id"
     return sql, args
 
 
 def save_drink_query(drink):
     if not drink.id:
-        sql = 'insert into drink values (?, ?, ?)'
+        sql = "insert into drink values (?, ?, ?)"
         args = (None, drink.name, drink.vol)
     else:
-        sql = 'update drink ' \
-              'set name=?, vol=? ' \
-              'where id==?'
+        sql = "update drink " "set name=?, vol=? " "where id==?"
         args = (drink.name, drink.vol, drink.id)
     return sql, args
 
@@ -111,54 +109,58 @@ def save_drink(drink):
 
 
 def load_enemies(id=None):
-    sql = 'select * from enemy'
+    sql = "select * from enemy"
     args = ()
     if id:
-        sql += ' where enemy.id = ?'
-        args = (id, )
-    sql += ' order by enemy.id'
+        sql += " where enemy.id = ?"
+        args = (id,)
+    sql += " order by enemy.id"
     return sql, args
 
 
 def save_enemy(enemy: models.Enemy):
     if not enemy.id:
-        sql = 'insert into enemy values (?, ?, ?, ?)'
+        sql = "insert into enemy values (?, ?, ?, ?)"
         args = (None, enemy.name, enemy.boss, enemy.season_id)
     else:
-        sql = 'update enemy ' \
-              'set name=?, boss=?, season_id=? ' \
-              'where id==?'
+        sql = "update enemy " "set name=?, boss=?, season_id=? " "where id==?"
         args = (enemy.name, enemy.boss, enemy.season_id, enemy.id)
     return sql, args
 
 
 def save_season_query(season: models.Season):
     if not season.id:
-        sql = 'insert into season values (?, ?, ?, ?, ?, ?)'
-        args = (None,
-                season.game,
-                season.description,
-                season.start,
-                season.end,
-                season.code)
+        sql = "insert into season values (?, ?, ?, ?, ?, ?)"
+        args = (
+            None,
+            season.game,
+            season.description,
+            season.start,
+            season.end,
+            season.code,
+        )
     else:
-        sql = 'update season ' \
-              'set game=?, description=?, start=?, end=?, code=? ' \
-              'where id==?'
-        args = (season.game,
-                season.description,
-                season.start,
-                season.end,
-                season.code,
-                season.id)
+        sql = (
+            "update season "
+            "set game=?, description=?, start=?, end=?, code=? "
+            "where id==?"
+        )
+        args = (
+            season.game,
+            season.description,
+            season.start,
+            season.end,
+            season.code,
+            season.id,
+        )
     return sql, args
 
 
 def load_season(id=None):
-    sql = 'select * from season'
+    sql = "select * from season"
     args = ()
     if id:
-        sql += ' where season.id = ?'
-        args = (id, )
-    sql += ' order by season.start'
+        sql += " where season.id = ?"
+        args = (id,)
+    sql += " order by season.start"
     return sql, args

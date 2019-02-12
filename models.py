@@ -80,32 +80,32 @@ class Season:
 
     @classmethod
     def from_form(cls, form):
-        id = form.get('id', None)
+        id = form.get("id", None)
         id = int(id) if id else None
 
-        game = form.get('game', None)
+        game = form.get("game", None)
         if not game:
-            raise AttributeError(INVALID_STR.format('game'))
+            raise AttributeError(INVALID_STR.format("game"))
         game = str(game)
 
-        description = form.get('description', None)
+        description = form.get("description", None)
 
-        start = form.get('start', None)
+        start = form.get("start", None)
         try:
             start = datetime.date.fromisoformat(start)
         except Exception:
-            raise AttributeError(INVALID_STR.format('start'))
+            raise AttributeError(INVALID_STR.format("start"))
 
-        end = form.get('end', None)
+        end = form.get("end", None)
         if end:
             try:
                 end = datetime.date.fromisoformat(end)
             except Exception:
-                raise AttributeError(INVALID_STR.format('end'))
+                raise AttributeError(INVALID_STR.format("end"))
 
-        code = form.get('code', None)
+        code = form.get("code", None)
         if not code:
-            raise AttributeError(INVALID_STR.format('code'))
+            raise AttributeError(INVALID_STR.format("code"))
 
         self = cls(id, game, description, start, end, code)
         return self
