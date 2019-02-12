@@ -9,7 +9,7 @@ import db
 import forms
 import models
 import const
-from config import Config, roles
+from config import Config
 
 
 logging.basicConfig(filename=const.LOG_PATH, level=logging.DEBUG)
@@ -44,7 +44,7 @@ def close_connection(exception):
 
 def set_user_role(data):
     """Set the users role in the flask g object for later usage"""
-    g.is_editor = data == "editor"
+    g.is_editor = data == "write"
 
 
 def authorize(func):
@@ -59,17 +59,24 @@ def authorize(func):
     return wrapper
 
 
+def get_role(password):
+    if password == Config.WRITE_PW:
+        return "write"
+    if password == Config.READ_PW:
+        return "read"
+    return False
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "GET":
         return render_template("login.html")
     else:
-        try:
-            password = request.form["password"]
-            session["role"] = roles()[password]
-            return redirect("/")
-        except KeyError:
-            return redirect("login")
+        role = get_role(request.form.get("password"))
+        if not role:
+            return redirect("/login")
+        session["role"] = role
+        return redirect("/")
 
 
 @app.route("/logout")
