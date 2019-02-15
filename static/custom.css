@@ -1,3 +1,41 @@
+/* Some Colors */
+a {
+    color: #b52828
+}
+a:visited {
+  text-decoration: none;
+}
+a:hover {
+  color: #fd5454;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: #b52828;
+  border-color: #b52828;
+}
+.btn-primary:hover {
+  background-color: #fd5454;
+  border-color: #fd5454;
+}
+
+.btn-default {
+  background-color: #3b3b3b;
+  border-color: #3b3b3b;
+}
+.btn-default:hover {
+  background-color: #3b3b3b;
+  border-color: #fd5454;
+}
+
+.icon-primary{
+  color: #b52828
+}
+
+.brand-icon{
+  height: 40px;
+}
+
 .vertical-center {
   min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
   min-height: 100vh; /* These two lines are counted as one :-)       */

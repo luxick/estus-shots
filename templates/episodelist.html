@@ -31,10 +31,10 @@
               <td class="col-sm-auto text-center">{{ ep[prop] }}</td>
             {% endfor %}
 
-            <a class="btn btn-dark" href="/episodes/{{ ep['id'] }}">Show</a>
+            <a class="btn btn-default" href="/episodes/{{ ep['id'] }}">Show</a>
             {% if g.is_editor %}
                 <td class="col-sm-auto text-center">
-                  <a class="btn btn-dark" href="/editepisode/{{ ep['id'] }}">Edit</a>
+                  <a class="btn btn-default" href="/editepisode/{{ ep['id'] }}">Edit</a>
                 </td>
             {% endif %}
           </tr>
