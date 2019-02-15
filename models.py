@@ -1,4 +1,5 @@
 import datetime
+from typing import Dict, List
 from dataclasses import dataclass
 
 import forms
@@ -11,6 +12,7 @@ class GenericFormModel:
     page_title: str
     form_title: str
     post_url: str
+    errors: Dict[str, List[str]] = None
 
 
 @dataclass
@@ -78,34 +80,24 @@ class Season:
     end: datetime.date
     code: str
 
-    @classmethod
-    def from_form(cls, form):
-        id = form.get("id", None)
-        id = int(id) if id else None
-
-        game = form.get("game", None)
-        if not game:
-            raise AttributeError(INVALID_STR.format("game"))
-        game = str(game)
-
-        description = form.get("description", None)
-
-        start = form.get("start", None)
+    def __post_init__(self):
         try:
-            start = datetime.date.fromisoformat(start)
+            self.start = datetime.datetime.strptime(self.start, "%Y-%m-%d").date()
         except Exception:
-            raise AttributeError(INVALID_STR.format("start"))
+            pass
+        try:
+            self.end = datetime.datetime.strptime(self.end, "%Y-%m-%d").date()
+        except Exception:
+            pass
 
-        end = form.get("end", None)
-        if end:
-            try:
-                end = datetime.date.fromisoformat(end)
-            except Exception:
-                raise AttributeError(INVALID_STR.format("end"))
+    @classmethod
+    def from_form(cls, form: forms.SeasonForm):
+        season_id = int(form.season_id.data) if form.season_id.data else None
+        code = str(form.code.data)
+        game = str(form.game_name.data)
+        description = str(form.description.data) if form.description.data else None
+        start = form.start.data
+        end = form.end.data
 
-        code = form.get("code", None)
-        if not code:
-            raise AttributeError(INVALID_STR.format("code"))
-
-        self = cls(id, game, description, start, end, code)
+        self = cls(season_id, game, description, start, end, code)
         return self

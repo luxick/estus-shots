@@ -5,7 +5,7 @@
 {% block page %}
   {% if g.is_editor %}
     <div class="btn-toolbar" role="toolbar">
-      <a class="btn btn-primary" href="/seasons/new" role="button"><span class="fas fa-plus"></span> Season</a>
+      <a class="btn btn-primary" href="{{ url_for("season_new") }}" role="button"><span class="fas fa-plus"></span> Season</a>
     </div>
   {% endif %}
 {% if not model.seasons %}
@@ -40,9 +40,11 @@
 
             {% if g.is_editor %}
               <td class="col-sm-auto text-center">
-                <a class="btn btn-dark" href="/seasons/{{ item.id }}/edit"><span class="fas fa-pencil-alt"></span></a>
+                <a class="btn btn-dark" href="{{ url_for('season_edit', season_id = item.id) }}">
+                  <span class="fas fa-pencil-alt"></span>
+                </a>
 
-                <a class="btn btn-dark" href="/seasons/{{ item.id }}/new">
+                <a class="btn btn-dark" href="#">
                   <span class="fas fa-plus"></span> Episode
                 </a>
               </td>

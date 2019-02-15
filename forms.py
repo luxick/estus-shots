@@ -8,9 +8,19 @@ from wtforms import (
     DecimalField,
     SelectField,
 )
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional
 
 import choices
+
+
+class SeasonForm(FlaskForm):
+    season_id = StringField("Season ID", render_kw={"readonly": True})
+    code = StringField("Season Code", validators=[DataRequired()])
+    game_name = StringField("Game Name", validators=[DataRequired()])
+    description = StringField("Season Description")
+    start = DateField("Season Start", format="%Y-%m-%d", validators=[DataRequired()])
+    end = DateField("Season End", format="%Y-%m-%d", validators=[Optional()])
+    submit_button = SubmitField("Submit")
 
 
 class EpisodeForm(FlaskForm):

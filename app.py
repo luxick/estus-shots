@@ -2,7 +2,7 @@ import functools
 import logging
 import os
 
-from flask import Flask, g, render_template, request, redirect, session
+from flask import Flask, g, render_template, request, redirect, session, url_for
 from flask_bootstrap import Bootstrap
 
 import db
@@ -104,34 +104,55 @@ def season_list():
             ("end", "Ended At"),
         ],
     }
-    return render_template("seasons.html", model=model)
+    return render_template("season_list.html", model=model)
 
 
 @app.route("/seasons/new", methods=["GET"])
 @authorize
 def season_new():
-    return render_template("editseason.html", model={})
+    form = forms.SeasonForm()
+    model = models.GenericFormModel(
+        page_title="New Season",
+        form_title="Create New Season",
+        post_url="/seasons/edit/null",
+    )
+    return render_template("generic_form.html", model=model, form=form)
 
 
-@app.route("/seasons/<id>/edit")
+@app.route("/seasons/edit/<season_id>", methods=["GET", "POST"])
 @authorize
-def season_edit(id: int):
-    sql, args = db.load_season(id)
-    loaded = db.query_db(sql, args, one=True, cls=models.Season)
-    return render_template("editseason.html", model=loaded)
+def season_edit(season_id: int):
+    model = models.GenericFormModel(
+        page_title="Seasons",
+        form_title="Edit Season",
+        post_url=f"/seasons/edit/{season_id}",
+    )
 
+    if request.method == "GET":
+        sql, args = db.load_season(season_id)
+        season: models.Season = db.query_db(sql, args, one=True, cls=models.Season)
 
-@app.route("/seasons/save", methods=["POST"])
-@authorize
-def season_save():
-    try:
-        season = models.Season.from_form(request.form)
-    except AttributeError as err:
-        print(err)
-        return render_template("editseason.html", model={})
-    sql, args = db.save_season_query(season)
-    res = db.update_db(sql, args)
-    return redirect("/seasons")
+        form = forms.SeasonForm()
+        form.season_id.data = season.id
+        form.code.data = season.code
+        form.game_name.data = season.game
+        form.description.data = season.description
+        form.start.data = season.start
+        form.end.data = season.end
+
+        model.form_title = f"Edit Season '{season.code}: {season.game}'"
+        return render_template("generic_form.html", model=model, form=form)
+    else:
+        form = forms.SeasonForm()
+
+        if not form.validate_on_submit():
+            model.errors = form.errors
+            return render_template("generic_form.html", model=model, form=form)
+
+        season = models.Season.from_form(form)
+        sql, args = db.save_season_query(season)
+        errors = db.update_db(sql, args)
+        return redirect(url_for("season_list"))
 
 
 @app.route("/seasons/<season_id>", methods=["GET"])
@@ -341,9 +362,6 @@ def enemy_edit(enemy_id: int):
     )
 
     if request.method == "GET":
-        sql, args = db.load_season()
-        seasons = db.query_db(sql, args, cls=models.Season)
-
         sql, args = db.load_enemies(enemy_id)
         enemy = db.query_db(sql, args, one=True, cls=models.Enemy)
 
