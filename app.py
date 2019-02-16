@@ -160,14 +160,22 @@ def season_edit(season_id: int):
 @authorize
 def season_overview(season_id: int):
     sql, args = db.load_season(season_id)
-    db_season = db.query_db(sql, args, one=True, cls=models.Season)
+    season = db.query_db(sql, args, one=True, cls=models.Season)
+
+    sql, args = db.load_episodes(season.id)
+    episodes = db.query_db(sql, args, cls=models.Episode)
+
     infos = {
-        "Number": db_season.code,
-        "Game": db_season.game,
-        "Start Date": db_season.start,
-        "End Date": db_season.end if db_season.end else "Ongoing",
+        "Number": season.code,
+        "Game": season.game,
+        "Start Date": season.start,
+        "End Date": season.end if season.end else "Ongoing",
     }
-    model = {"title": f"{db_season.code} {db_season.game}", "season_info": infos}
+    model = {
+        "title": f"{season.code} {season.game}",
+        "season_info": infos,
+        "episodes": episodes
+    }
     return render_template("season_overview.html", model=model)
 
 
@@ -187,7 +195,7 @@ def episode_new(season_id: int):
     model = models.GenericFormModel(
         page_title="New Episode",
         form_title="Create New Episode",
-        post_url="/episodes/save",
+        post_url=f"/seasons/{season_id}/episodes/edit/null",
     )
 
     form = forms.EpisodeForm(request.form)
@@ -198,10 +206,34 @@ def episode_new(season_id: int):
 @app.route("/seasons/<season_id>/episodes/edit/<episode_id>", methods=["GET", "POST"])
 @authorize
 def episode_edit(season_id: int, episode_id: int):
+    model = models.GenericFormModel(
+        page_title="Edit Episode",
+        form_title="Edit Episode",
+        post_url=f"/seasons/{season_id}/episodes/edit/{episode_id}",
+    )
+
     if request.method == "GET":
-        pass
+        sql, args = db.load_episode(episode_id)
+        episode: models.Episode = db.query_db(sql, args, one=True, cls=models.Episode)
+
+        form = forms.EpisodeForm()
+
+        model.form_title = f"Edit Episode '{episode.code}: {episode.title}'"
+        return render_template("generic_form.html", model=model, form=form)
     else:
-        pass
+        form = forms.EpisodeForm()
+
+        if not form.validate_on_submit():
+            model.errors = form.errors
+            return render_template("generic_form.html", model=model, form=form)
+
+        episode = models.Episode.from_form(form)
+        sql, args = db.save_episode(episode)
+        errors = db.update_db(sql, args)
+        if errors:
+            model.errors = {"Error saving episode": [errors]}
+            return render_template("generic_form.html", model=model, form=form)
+        return redirect(url_for("season_overview", season_id=season_id))
 
 
 @app.route("/players/new")

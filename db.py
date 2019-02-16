@@ -4,6 +4,7 @@ from flask import g
 
 import models
 from config import Config
+from util import time_to_str
 
 
 def connect_db():
@@ -166,6 +167,16 @@ def load_season(id=None):
     return sql, args
 
 
+def load_episode(episode_id: int = None):
+    sql = "select * from episode"
+    args = ()
+    if episode_id:
+        sql += " where episode.id = ?"
+        args = (episode_id,)
+    sql += " order by episode.code"
+    return sql, args
+
+
 def load_episodes(season_id: int = None):
     sql = "select * from episode"
     args = ()
@@ -173,4 +184,34 @@ def load_episodes(season_id: int = None):
         sql += " where episode.season_id = ?"
         args = (season_id,)
     sql += " order by episode.code"
+    return sql, args
+
+
+def save_episode(episode: models.Episode):
+    if not episode.id:
+        sql = "insert into episode values (?, ?, ?, ?, ?, ?, ?)"
+        args = (
+            None,
+            episode.season_id,
+            episode.title,
+            episode.date,
+            time_to_str(episode.start),
+            time_to_str(episode.end),
+            episode.code
+        )
+    else:
+        sql = (
+            "update episode "
+            "set season_id=?, title=?, date=?, start=?, end=?, code=?"
+            "where id==?"
+        )
+        args = (
+            episode.season_id,
+            episode.title,
+            episode.date,
+            time_to_str(episode.start),
+            time_to_str(episode.end),
+            episode.code,
+            episode.id,
+        )
     return sql, args

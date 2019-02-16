@@ -74,3 +74,7 @@ create table if not exists episode
 
 create unique index if not exists episode_id_uindex
 	on episode (id);
+
+
+alter table episode
+	add code text not null default 'EXX';

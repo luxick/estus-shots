@@ -1,8 +1,10 @@
 import datetime
+import logging
 from typing import Dict, List
 from dataclasses import dataclass
 
 import forms
+from util import str_to_time
 
 INVALID_STR = 'Form entry "{}" is invalid'
 
@@ -111,8 +113,24 @@ class Episode:
     date: datetime.date
     start: datetime.time
     end: datetime.time
+    code: str
 
     def __post_init__(self):
-        self.date = datetime.datetime.strptime(self.date, "%Y-%m-%d").date()
-        self.start = datetime.datetime.strptime(self.start, "%H:%M").time()
-        self.end = datetime.datetime.strptime(self.end, "%H:%M").time()
+        try:
+            self.date = datetime.datetime.strptime(self.date, "%Y-%m-%d").date()
+        except TypeError as err:
+            logging.warning(err)
+        self.start = str_to_time(str(self.start))
+        self.end = str_to_time(str(self.end))
+
+    @classmethod
+    def from_form(cls, form: forms.EpisodeForm):
+        episode_id = int(form.episode_id.data) if form.episode_id.data else None
+        season_id = int(form.season_id.data)
+        title = str(form.title.data)
+        date = form.date.data
+        start = form.start.data
+        end = form.end.data
+        code = str(form.code.data)
+
+        return cls(episode_id, season_id, title, date, start, end, code)
