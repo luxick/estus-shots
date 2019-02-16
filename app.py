@@ -42,14 +42,14 @@ def close_connection(exception):
 
 def set_user_role(data):
     """Set the users role in the flask g object for later usage"""
-    g.is_editor = data == "write"
+    g.is_editor = data == "editor"
 
 
 def authorize(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:
-            set_user_role(session["role"])
+            set_user_role(session["user_type"])
         except KeyError:
             return redirect("/login")
         return func(*args, **kwargs)
@@ -57,11 +57,12 @@ def authorize(func):
     return wrapper
 
 
-def get_role(password):
+def get_user_type(password):
+    # TODO password hashing?
     if password == Config.WRITE_PW:
-        return "write"
+        return "editor"
     if password == Config.READ_PW:
-        return "read"
+        return "readonly"
     return False
 
 
@@ -70,10 +71,10 @@ def login():
     if request.method == "GET":
         return render_template("login.html")
     else:
-        role = get_role(request.form.get("password"))
-        if not role:
+        user_type = get_user_type(request.form.get("password"))
+        if not user_type:
             return redirect("/login")
-        session["role"] = role
+        session["user_type"] = user_type
         return redirect("/")
 
 
@@ -167,7 +168,7 @@ def season_overview(season_id: int):
         "End Date": db_season.end if db_season.end else "Ongoing",
     }
     model = {"title": f"{db_season.code} {db_season.game}", "season_info": infos}
-    return render_template("seasonoverview.html", model=model)
+    return render_template("season_overview.html", model=model)
 
 
 @app.route("/seasons/<season_id>/episodes", methods=["GET"])
@@ -177,10 +178,10 @@ def episode_list(season_id: int):
     db_season = db.query_db(sql, args, one=True, cls=models.Season)
 
     model = {"season_id": season_id, "season_code": db_season.code}
-    return render_template("episodelist.html", model=model)
+    return render_template("episode_list.html", model=model)
 
 
-@app.route("/seasons/<season_id>/new", methods=["GET"])
+@app.route("/seasons/<season_id>/episodes/new", methods=["GET"])
 @authorize
 def episode_new(season_id: int):
     model = models.GenericFormModel(
@@ -194,12 +195,13 @@ def episode_new(season_id: int):
     return render_template("generic_form.html", model=model, form=form)
 
 
-@app.route("/episodes/save", methods=["POST"])
+@app.route("/seasons/<season_id>/episodes/edit/<episode_id>", methods=["GET", "POST"])
 @authorize
-def episode_save():
-    form = forms.EpisodeForm(request.form)
-    val = form.validate()
-    return render_template("editepisode.html", form=form)
+def episode_edit(season_id: int, episode_id: int):
+    if request.method == "GET":
+        pass
+    else:
+        pass
 
 
 @app.route("/players/new")

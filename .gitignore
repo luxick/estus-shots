@@ -94,3 +94,4 @@ Screenshots/
 .vscode
 typesheds/
 *.db
+*.env

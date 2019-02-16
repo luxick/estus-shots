@@ -101,3 +101,18 @@ class Season:
 
         self = cls(season_id, game, description, start, end, code)
         return self
+
+
+@dataclass
+class Episode:
+    id: int
+    season_id: int
+    title: str
+    date: datetime.date
+    start: datetime.time
+    end: datetime.time
+
+    def __post_init__(self):
+        self.date = datetime.datetime.strptime(self.date, "%Y-%m-%d").date()
+        self.start = datetime.datetime.strptime(self.start, "%H:%M").time()
+        self.end = datetime.datetime.strptime(self.end, "%H:%M").time()

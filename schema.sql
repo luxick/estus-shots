@@ -55,3 +55,22 @@ create table if not exists enemy
 
 create unique index if not exists enemy_id_uindex
 	on enemy (id);
+
+
+
+create table if not exists episode
+(
+	id integer not null
+		constraint episode_pk
+			primary key autoincrement,
+	season_id integer not null
+		constraint episode_season_id_fk
+			references season,
+	title text not null,
+	date text not null,
+	start text not null,
+	end text not null
+);
+
+create unique index if not exists episode_id_uindex
+	on episode (id);

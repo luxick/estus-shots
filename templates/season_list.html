@@ -44,7 +44,7 @@
                   <span class="fas fa-pencil-alt"></span>
                 </a>
 
-                <a class="btn btn-default" href="#">
+                <a class="btn btn-default" href="{{ url_for("episode_new", season_id = item.id) }}">
                   <span class="fas fa-plus"></span> Episode
                 </a>
               </td>
