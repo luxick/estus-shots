@@ -5,7 +5,7 @@
 {% block page %}
   {% if g.is_editor %}
     <div class="btn-toolbar" role="toolbar">
-      <a class="btn btn-primary" href="{{ url_for('player_new') }}" role="button">New Player</a>
+      <a class="btn btn-primary" href="{{ url_for('player_new') }}" role="button"><span class="fas fa-plus"></span> Player</a>
     </div>
   {% endif %}
   {% if not model.player_list %}

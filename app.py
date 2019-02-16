@@ -265,7 +265,7 @@ def player_list():
             ("hex_id", "Hex ID"),
         ],
     }
-    return render_template("players.html", model=model)
+    return render_template("player_list.html", model=model)
 
 
 @app.route("/drinks")
@@ -278,7 +278,7 @@ def drink_list():
         "columns": [("id", "ID"), ("name", "Drink Name"), ("vol", "Alcohol %")],
         "controls": [("edit", "Edit")],
     }
-    return render_template("drinks.html", model=model)
+    return render_template("drink_list.html", model=model)
 
 
 @app.route("/drinks/<drink_id>/edit", methods=["GET"])
