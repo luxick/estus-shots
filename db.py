@@ -162,7 +162,7 @@ def load_season(id=None):
     if id:
         sql += " where season.id = ?"
         args = (id,)
-    sql += " order by season.start"
+    sql += " order by season.code"
     return sql, args
 
 
@@ -172,5 +172,5 @@ def load_episodes(season_id: int = None):
     if season_id:
         sql += " where episode.season_id = ?"
         args = (season_id,)
-    sql += " order by episode.date"
+    sql += " order by episode.code"
     return sql, args
