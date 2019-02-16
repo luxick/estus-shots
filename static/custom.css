@@ -1,3 +1,12 @@
+@font-face {
+    font-family: 'DarkSouls';
+    src: url('/static/OptimusPrinceps.ttf');
+}
+@font-face {
+    font-family: 'DarkSoulsBold';
+    src: url('/static/OptimusPrincepsSemiBold.ttf');
+}
+
 /* Some Colors */
 a {
     color: #b52828
@@ -34,6 +43,12 @@ a:hover {
 
 .brand-icon{
   height: 40px;
+}
+.navbar-brand{
+  font-family: 'DarkSoulsBold', serif;
+}
+.nav-link {
+  font-family: 'DarkSouls', serif;
 }
 
 .vertical-center {
