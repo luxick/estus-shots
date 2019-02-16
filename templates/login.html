@@ -6,13 +6,13 @@
   {{ super() }}
   <link rel="stylesheet" href="/static/dark_theme.css">
   <link rel="stylesheet" href="/static/custom.css">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 {% endblock %}
 
 {% block body_attribs %}
-  style="background-image: url(/static/img/elite.png);
-    background-repeat: no-repeat;
-    background-position-x: left;
-    background-position-y: bottom;"
+  style="background-image: url(/static/img/elite.png), url(/static/img/solaire300x300.png);
+    background-repeat: no-repeat, no-repeat;
+    background-position: left bottom, right bottom;"
 {% endblock %}
 
 {% block content %}
@@ -20,7 +20,7 @@
   <div class="container vertical-center">
     <div class="card text-center mx-auto" style="width: 15rem">
 
-      <img src="/static/img/solaire.png" alt="Login" style="height: 15rem">
+      <img src="/static/img/estus.png" alt="Login" style="height: 15rem">
 
       <div class="card-body">
         <form method="post">
