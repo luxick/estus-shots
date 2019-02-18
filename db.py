@@ -20,7 +20,7 @@ def connect_db():
 
 def query_db(query, args=(), one=False, cls=None):
     """Runs an SQL query on an new database connection, returning the fetched rv"""
-    log.info(f"Running query ({query}) with arguments ({args})")
+    log.debug(f"Running query ({query}) with arguments ({args})")
     cur = connect_db().execute(query, args)
     rv = cur.fetchall()
     cur.close()
@@ -34,6 +34,7 @@ def update_db(query, args=()):
     Runs an changing query on the database
     Returns either False if no error has occurred, or an sqlite3 Exception
     """
+    log.debug(f"Running query ({query}) with arguments ({args})")
     with connect_db() as con:
         try:
             con.cursor().execute(query, args)
@@ -195,9 +196,9 @@ def save_episode(episode: models.Episode):
             episode.season_id,
             episode.title,
             episode.date,
-            time_to_str(episode.start),
-            time_to_str(episode.end),
-            episode.code
+            episode.start.timestamp(),
+            episode.end.timestamp(),
+            episode.code,
         )
     else:
         sql = (
@@ -209,8 +210,8 @@ def save_episode(episode: models.Episode):
             episode.season_id,
             episode.title,
             episode.date,
-            time_to_str(episode.start),
-            time_to_str(episode.end),
+            episode.start.timestamp(),
+            episode.end.timestamp(),
             episode.code,
             episode.id,
         )

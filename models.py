@@ -1,12 +1,10 @@
 import datetime
-import logging
-from typing import Dict, List
+from numbers import Rational
+from typing import Dict, List, Union
 from dataclasses import dataclass
 
 import forms
-from util import str_to_time
-
-INVALID_STR = 'Form entry "{}" is invalid'
+import util
 
 
 @dataclass
@@ -110,27 +108,30 @@ class Episode:
     id: int
     season_id: int
     title: str
-    date: datetime.date
-    start: datetime.time
-    end: datetime.time
+    date: Union[datetime.date, Rational]
+    start: Union[datetime.datetime, Rational]
+    end: Union[datetime.datetime, Rational]
     code: str
 
     def __post_init__(self):
-        try:
-            self.date = datetime.datetime.strptime(self.date, "%Y-%m-%d").date()
-        except TypeError as err:
-            logging.warning(err)
-        self.start = str_to_time(str(self.start))
-        self.end = str_to_time(str(self.end))
+        if isinstance(self.date, Rational):
+            self.date = datetime.date.fromtimestamp(self.date)
+        if isinstance(self.start, Rational):
+            self.start = datetime.datetime.fromtimestamp(self.start)
+        if isinstance(self.end, Rational):
+            self.end = datetime.datetime.fromtimestamp(self.end)
 
     @classmethod
     def from_form(cls, form: forms.EpisodeForm):
         episode_id = int(form.episode_id.data) if form.episode_id.data else None
         season_id = int(form.season_id.data)
-        title = str(form.title.data)
-        date = form.date.data
-        start = form.start.data
-        end = form.end.data
         code = str(form.code.data)
+        title = str(form.title.data)
+
+        date = form.date.data
+        start = util.combine_datetime(date, form.start.data)
+        end = util.combine_datetime(date, form.end.data)
+        if end < start:
+            end = end + datetime.timedelta(days=1)
 
         return cls(episode_id, season_id, title, date, start, end, code)

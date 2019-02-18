@@ -78,3 +78,27 @@ create unique index if not exists episode_id_uindex
 
 alter table episode
 	add code text not null default 'EXX';
+
+
+create table episode_dg_tmp
+(
+	id integer not null
+		constraint episode_pk
+			primary key autoincrement,
+	season_id integer not null
+		references season,
+	title text not null,
+	date text not null,
+	start timestamp not null,
+	end timestamp not null,
+	code text default 'EXX' not null
+);
+
+insert into episode_dg_tmp(id, season_id, title, date, start, end, code) select id, season_id, title, date, start, end, code from episode;
+
+drop table episode;
+
+alter table episode_dg_tmp rename to episode;
+
+create unique index episode_id_uindex
+	on episode (id);
