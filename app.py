@@ -183,9 +183,13 @@ def season_overview(season_id: int):
 @authorize
 def episode_list(season_id: int):
     sql, args = db.load_season(season_id)
-    db_season = db.query_db(sql, args, one=True, cls=models.Season)
+    season = db.query_db(sql, args, one=True, cls=models.Season)
+    sql, args = db.load_episodes(season_id)
+    episodes = db.query_db(sql, args, cls=models.Episode)
 
-    model = {"season_id": season_id, "season_code": db_season.code}
+    model = {
+        "season_id": season_id,
+        "season_code": season.code}
     return render_template("episode_list.html", model=model)
 
 

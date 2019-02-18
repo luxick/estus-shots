@@ -5,36 +5,48 @@
 {% block content %}
   {% if g.is_editor %}
     <div class="btn-toolbar" role="toolbar">
-      <a class="btn btn-primary" href="/newepisode" role="button">New Episode</a>
+      <a class="btn btn-primary" href="{{ url_for("episode_new", season_id = model.season_id)}}" role="button">
+        <span class="fas fa-plus"></span>Episode
+      </a>
     </div>
   {% endif %}
   {% if not model.player_list %}
-    There are no episodes.
+    <div class="alert alert-info">There are no episodes.</div>
   {% else %}
       <table class="table table-hover table-striped table-bordered">
         <thead>
           <tr>
-            {% for prop, caption in model.columns %}
-              <th scope="col" class="col-sm-auto text-center">{{ caption }}</th>
-            {% endfor %}
+            <th scope="col" class="col-sm-auto text-center">#</th>
+            <th scope="col" class="col-sm-auto text-center">Title</th>
+            <th scope="col" class="col-sm-auto text-center">Date</th>
+            <th scope="col" class="col-sm-auto text-center">From - To</th>
+            <th scope="col" class="col-sm-auto text-center">Playtime</th>
 
-            <th scope="col" class="col-sm-auto text-center"></th>
+            <th scope="col" class="col-sm-auto text-center">Stats</th>
             {% if g.is_editor %}
-                <th scope="col" class="col-sm-auto text-center"></th>
+                <th scope="col" class="col-sm-auto text-center">Editor</th>
             {% endif %}
           </tr>
         </thead>
         <tbody>
-          {% for ep in model.episodes %}
+          {% for item in model.episodes %}
           <tr>
-            {% for prop, _ in model.columns %}
-              <td class="col-sm-auto text-center">{{ ep[prop] }}</td>
-            {% endfor %}
+            <td class="col-sm-auto text-center">{{ item.code }}</td>
+            <td class="col-sm-auto text-center">{{ item.title }}</td>
+            <td class="col-sm-auto text-center">{{ item.date }}</td>
+            <td class="col-sm-auto text-center">{{ item.start }} - {{ item.end }}</td>
+            <td class="col-sm-auto text-center">{{ item.duration }}</td>
 
-            <a class="btn btn-default" href="/episodes/{{ ep['id'] }}">Show</a>
+            <td class="col-sm-auto text-center">
+                  <a class="btn btn-default" href="{{ url_for("episode_stats", episode_id = item.id) }}">
+                    <span class="fas fa-eye"></span>
+                  </a>
+            </td>
             {% if g.is_editor %}
                 <td class="col-sm-auto text-center">
-                  <a class="btn btn-default" href="/editepisode/{{ ep['id'] }}">Edit</a>
+                  <a class="btn btn-default" href="{{ url_for("episode_edit", episode_id = item.id, season_id = model.season_id) }}">
+                    <span class="fas fa-pencil-alt"></span>
+                  </a>
                 </td>
             {% endif %}
           </tr>

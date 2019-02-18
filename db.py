@@ -4,7 +4,6 @@ from flask import g
 
 import models
 from config import Config
-from util import time_to_str
 
 
 def connect_db():
