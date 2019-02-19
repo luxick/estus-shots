@@ -7,6 +7,7 @@ from wtforms import (
     BooleanField,
     DecimalField,
     SelectField,
+    SelectMultipleField,
 )
 from wtforms.validators import DataRequired, Optional
 
@@ -28,10 +29,12 @@ class EpisodeForm(FlaskForm):
     episode_id = StringField("Episode ID", render_kw={"readonly": True})
     code = StringField("Episode Code", validators=[DataRequired()])
     title = StringField("Title", validators=[DataRequired()])
-    description = StringField("Description", validators=[])
     date = DateField("Episode Date", format="%Y-%m-%d", validators=[DataRequired()])
     start = TimeField("Start Time", format="%H:%M", validators=[DataRequired()])
     end = TimeField("End Time", format="%H:%M", validators=[DataRequired()])
+    players = SelectMultipleField(
+        "Players", coerce=int, choices=choices.PlayerChoiceIterable()
+    )
     submit_button = SubmitField("Submit")
 
 

@@ -1,5 +1,7 @@
 import sqlite3
 import logging as log
+from typing import Sequence
+
 from flask import g
 
 import models
@@ -184,6 +186,12 @@ def load_episodes(season_id: int = None):
         sql += " where episode.season_id = ?"
         args = (season_id,)
     sql += " order by episode.code"
+    return sql, args
+
+
+def save_episode_players(episode_id: int, player_ids: Sequence[int]):
+    sql = "insert into episode_player values (?, ?)"
+    args = [(episode_id, i) for i in player_ids]
     return sql, args
 
 

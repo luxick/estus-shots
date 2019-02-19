@@ -13,6 +13,15 @@ def season_choices():
     return choices
 
 
+def player_choice():
+    """
+    Query database for a list of available players to bind them to a select box
+    """
+    sql, args = db.load_players()
+    players = db.query_db(sql, args, cls=models.Player)
+    return [(p.id, p.name) for p in players]
+
+
 class SeasonChoicesIterable:
     """
     This is used to declare choices for WTForms SelectFields at class definition time.
@@ -21,4 +30,15 @@ class SeasonChoicesIterable:
 
     def __iter__(self):
         for choice in season_choices():
+            yield choice
+
+
+class PlayerChoiceIterable:
+    """
+    This is used to declare choices for WTForms SelectFields at class definition time.
+    Be aware that this uses an undocumented WTForms feature and is not guaranteed to work.
+    """
+
+    def __iter__(self):
+        for choice in player_choice():
             yield choice
