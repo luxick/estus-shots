@@ -62,7 +62,7 @@
 
                 {% if g.is_editor %}
                   <td class="col-sm-auto text-center">
-                    <a class="btn btn-default" href="{{ url_for('episode_edit', season_id = item.id, episode_id = item.id) }}">
+                    <a class="btn btn-default" href="{{ url_for('episode_edit', season_id = item.season_id, episode_id = item.id) }}">
                       <span class="fas fa-pencil-alt"></span>
                     </a>
                   </td>
