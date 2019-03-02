@@ -205,13 +205,13 @@ def episode_new(season_id: int):
     return render_template("generic_form.html", model=model, form=form)
 
 
-@app.route("/seasons/<season_id>/episodes/edit/<episode_id>", methods=["GET", "POST"])
+@app.route("/seasons/<season_id>/episodes/<episode_id>/edit", methods=["GET", "POST"])
 @authorize
 def episode_edit(season_id: int, episode_id: int):
     model = models.GenericFormModel(
         page_title="Edit Episode",
         form_title="Edit Episode",
-        post_url=f"/seasons/{season_id}/episodes/edit/{episode_id}",
+        post_url=f"/seasons/{season_id}/episodes/{episode_id}/edit",
     )
 
     if request.method == "GET":
