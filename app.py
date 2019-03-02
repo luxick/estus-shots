@@ -179,6 +179,23 @@ def season_overview(season_id: int):
     return render_template("season_overview.html", model=model)
 
 
+@app.route("/seasons/<season_id>/episodes/<episode_id>")
+@authorize
+def episode_detail(season_id: int, episode_id: int):
+    sql, args = db.load_season(season_id)
+    season = db.query_db(sql, args, one=True, cls=models.Season)
+    sql, args = db.load_episode(episode_id)
+    episode = db.query_db(sql, args, one=True, cls=models.Episode)
+    sql, args = db.load_episode_players(episode_id)
+    ep_players = db.query_db(sql, args, cls=models.Player)
+
+    model = {
+        "title": f"{season.code}{episode.code}"
+    }
+
+    return render_template("episode_details.html", model=model)
+
+
 @app.route("/seasons/<season_id>/episodes", methods=["GET"])
 @authorize
 def episode_list(season_id: int):

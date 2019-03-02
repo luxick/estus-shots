@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% set active_page = "seasons" %}
-{% block title %}{{ model.title }}{% endblock %}
+{% block title %}{{ model.title }} {{ super() }}{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -57,7 +57,8 @@
                   <td class="col-sm-auto text-center">{{ item.title }}</td>
 
                   <td class="col-sm-auto text-center">
-                    <a class="btn btn-default" href="#"><span class="fas fa-eye"></span></a>
+                    <a class="btn btn-default" href="{{ url_for('episode_detail', season_id = item.season_id, episode_id = item.id) }}">
+                      <span class="fas fa-eye"></span></a>
                   </td>
 
                 {% if g.is_editor %}
