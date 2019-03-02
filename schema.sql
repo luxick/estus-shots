@@ -78,11 +78,16 @@ create unique index if not exists episode_id_uindex
 
 create table if not exists episode_player
 (
+	link_id integer not null
+		constraint episode_player_pk
+			primary key autoincrement,
 	episode_id integer not null
-		constraint episode_player_episode_id_fk
-			references episode,
+		references episode,
 	player_id integer not null
-		constraint episode_player_player_id_fk
-			references player
+		references player
 );
+
+create unique index if not exists episode_player_link_id_uindex
+	on episode_player (link_id);
+
 

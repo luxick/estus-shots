@@ -114,8 +114,8 @@ class Episode:
     code: str
 
     def __post_init__(self):
-        if isinstance(self.date, Rational):
-            self.date = datetime.date.fromtimestamp(self.date)
+        if isinstance(self.date, str):
+            self.date = datetime.datetime.strptime(self.date, util.DATE_FMT).date()
         if isinstance(self.start, Rational):
             self.start = datetime.datetime.fromtimestamp(self.start)
         if isinstance(self.end, Rational):

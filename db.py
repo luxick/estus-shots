@@ -8,6 +8,10 @@ import models
 from config import Config
 
 
+class DataBaseError(Exception):
+    """General exception class for SQL errors"""
+
+
 def connect_db():
     """Create a new sqlite3 connection and register it in 'g._database'"""
     db = getattr(g, "_database", None)
@@ -30,20 +34,34 @@ def query_db(query, args=(), one=False, cls=None):
     return (rv[0] if rv else None) if one else rv
 
 
-def update_db(query, args=()):
+def update_db(query, args=(), return_key: bool = False):
     """
     Runs an changing query on the database
     Returns either False if no error has occurred, or an sqlite3 Exception
+    :param query: An SQL query string
+    :param args: Tuple for inserting into a row
+    :param return_key: Changes return behavior of the function:
+    If used function will return last row id.
+    Exceptions will be raised instead of returned.
     """
     log.debug(f"Running query ({query}) with arguments ({args})")
     with connect_db() as con:
+        cur = con.cursor()
+
+        multi_args = any(isinstance(i, tuple) for i in args)
+
         try:
-            con.cursor().execute(query, args)
+            if multi_args:
+                cur.executemany(query, args)
+            else:
+                cur.execute(query, args)
         except sqlite3.Error as err:
-            return err
+            if not return_key:
+                return err
+            raise
         else:
             con.commit()
-    return False
+    return cur.lastrowid if return_key else False
 
 
 def init_db():
@@ -189,9 +207,31 @@ def load_episodes(season_id: int = None):
     return sql, args
 
 
+def load_episode_player_links(episode_id: int):
+    sql = "select * from episode_player where episode_id = ?"
+    args = (episode_id,)
+    return sql, args
+
+
+def load_episode_players(episode_id: int):
+    sql = "select player.* " \
+          "from player " \
+          "left join episode_player ep on player.id = ep.player_id " \
+          "where ep.episode_id = ?"
+    args = (episode_id,)
+    return sql, args
+
+
 def save_episode_players(episode_id: int, player_ids: Sequence[int]):
-    sql = "insert into episode_player values (?, ?)"
-    args = [(episode_id, i) for i in player_ids]
+    sql = "insert into episode_player values (?, ?, ?)"
+    args = tuple((None, episode_id, i) for i in player_ids)
+    return sql, args
+
+
+def remove_episode_player(episode_id: int, player_ids: Sequence[int]):
+    sql = "delete from episode_player " \
+          "where episode_id = ? and player_id = ?"
+    args = tuple((episode_id, pid) for pid in player_ids)
     return sql, args
 
 

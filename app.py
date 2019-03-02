@@ -174,7 +174,7 @@ def season_overview(season_id: int):
     model = {
         "title": f"{season.code} {season.game}",
         "season_info": infos,
-        "episodes": episodes
+        "episodes": episodes,
     }
     return render_template("season_overview.html", model=model)
 
@@ -187,9 +187,7 @@ def episode_list(season_id: int):
     sql, args = db.load_episodes(season_id)
     episodes = db.query_db(sql, args, cls=models.Episode)
 
-    model = {
-        "season_id": season_id,
-        "season_code": season.code}
+    model = {"season_id": season_id, "season_code": season.code}
     return render_template("episode_list.html", model=model)
 
 
@@ -220,7 +218,18 @@ def episode_edit(season_id: int, episode_id: int):
         sql, args = db.load_episode(episode_id)
         episode: models.Episode = db.query_db(sql, args, one=True, cls=models.Episode)
 
+        sql, args = db.load_episode_players(episode_id)
+        ep_players = db.query_db(sql, args, cls=models.Player)
+
         form = forms.EpisodeForm()
+        form.season_id.data = episode.season_id
+        form.episode_id.data = episode.id
+        form.code.data = episode.code
+        form.date.data = episode.date
+        form.start.data = episode.start
+        form.end.data = episode.end
+        form.title.data = episode.title
+        form.players.data = [p.id for p in ep_players]
 
         model.form_title = f"Edit Episode '{episode.code}: {episode.title}'"
         return render_template("generic_form.html", model=model, form=form)
@@ -231,9 +240,31 @@ def episode_edit(season_id: int, episode_id: int):
             model.errors = form.errors
             return render_template("generic_form.html", model=model, form=form)
 
+        errors = False
         episode = models.Episode.from_form(form)
         sql, args = db.save_episode(episode)
-        errors = db.update_db(sql, args)
+
+        last_key = db.update_db(sql, args, return_key=True)
+
+        episode_id = episode.id if episode.id else last_key
+
+        form_ids = form.players.data
+
+        sql, args = db.load_episode_players(episode_id)
+        ep_players = db.query_db(sql, args, cls=models.Player)
+        pids = [p.id for p in ep_players]
+
+        new_ids = [pid for pid in form_ids if pid not in pids]
+        removed_ids = [pid for pid in pids if pid not in form_ids]
+
+        if removed_ids:
+            sql, args = db.remove_episode_player(episode_id, removed_ids)
+            errors = db.update_db(sql, args)
+
+        if new_ids:
+            sql, args = db.save_episode_players(episode_id, new_ids)
+            errors = db.update_db(sql, args)
+
         if errors:
             model.errors = {"Error saving episode": [errors]}
             return render_template("generic_form.html", model=model, form=form)
