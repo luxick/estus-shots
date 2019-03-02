@@ -188,9 +188,10 @@ def episode_detail(season_id: int, episode_id: int):
     episode = db.query_db(sql, args, one=True, cls=models.Episode)
     sql, args = db.load_episode_players(episode_id)
     ep_players = db.query_db(sql, args, cls=models.Player)
-
     model = {
-        "title": f"{season.code}{episode.code}"
+        "title": f"{season.code}{episode.code}",
+        "episode": episode,
+        "players": ep_players
     }
 
     return render_template("episode_details.html", model=model)
