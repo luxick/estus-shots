@@ -62,3 +62,9 @@ a:hover {
   display: flex;
   align-items: center;
 }
+
+/* Theme customizations */
+.list-group-item:hover {
+  color: inherit;
+  background-color: rgb(34, 34, 34);
+}
