@@ -12,13 +12,24 @@ def str_to_datetime(data: str) -> datetime.datetime:
     return datetime.datetime.strptime(data, TIME_FMT)
 
 
-def time_to_str(data: datetime.time) -> str:
+def datetime_time_str(data: datetime) -> str:
     """
-    Convert a datetime.time object into a formatted string for sqlite
-    :param data: datetime.time
+    Convert a datetime object into a formatted string for display
+    :param data: datetime
     :return: str
     """
     return data.strftime(TIME_FMT)
+
+
+def timedelta_to_str(data: datetime.timedelta) -> str:
+    """
+    Remove second and microsecond portion from timedeltas for display
+    :param data: datetime.timedelta
+    :return: str
+    """
+    return str(
+        data - datetime.timedelta(seconds=data.seconds, microseconds=data.microseconds)
+    )
 
 
 def combine_datetime(date: datetime.date, time: datetime.time):
@@ -32,5 +43,5 @@ def combine_datetime(date: datetime.date, time: datetime.time):
         time.hour,
         time.minute,
         time.second,
-        time.microsecond
+        time.microsecond,
     )

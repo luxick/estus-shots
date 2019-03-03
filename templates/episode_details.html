@@ -2,10 +2,22 @@
 {% set active_page = "seasons" %}
 {% block title %}{{ model.title }} {{ super() }}{% endblock %}
 
-{% block content %}
-<div class="container">
+{% block page %}
+  {% if g.is_editor %}
+    <div class="btn-toolbar" role="toolbar">
+      <a class="btn btn-primary" role="button"
+         href="{{ url_for('episode_edit', season_id = model.season.id, episode_id = model.episode.id) }}">
+        <span class="fas fa-pencil-alt"></span> Edit Episode
+      </a>
+      <a class="btn btn-primary" role="button"
+         href="{{ url_for("event_new", episode_id = model.episode.id, season_id = model.season.id) }}" >
+        <span class="fas fa-plus"></span> Event
+      </a>
+    </div>
+  {% endif %}
+
   <div class="row">
-    <div class="col-6">
+    <div class="col-sm-6">
 
       <!--region Info Card-->
 
@@ -14,6 +26,34 @@
           {{ model.episode.code }}: {{ model.episode.title }}
         </div>
         <div class="card-body">
+          <div class="card-text">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  <span class="font-weight-bold">Date:</span>
+                  {{ model.episode.date }}
+                </li>
+                <li class="list-group-item">
+                  <span class="font-weight-bold">Start:</span>
+                  {{ model.episode.start|format_time }}
+                </li>
+                <li class="list-group-item">
+                  <span class="font-weight-bold">End:</span>
+                  {{ model.episode.end|format_time }}
+                </li>
+                <li class="list-group-item">
+                  <span class="font-weight-bold">Play Time:</span>
+                  {{ model.episode.playtime }}
+                </li>
+                <li class="list-group-item">
+                  <span class="font-weight-bold">Enemies Defeated:</span>
+                  {{ model.events.victory_count }}
+                </li>
+                <li class="list-group-item">
+                  <span class="font-weight-bold">Deaths:</span>
+                  {{ model.events.defeat_count }}
+                </li>
+              </ul>
+            </div>
         </div>
       </div>
 
@@ -49,15 +89,14 @@
 
     </div>
 
-    <div class="col-6">
+    <div class="col-sm-6">
       <div class="card">
         <div class="card-header text-center">
-          Events
+          Event List
         </div>
         <div class="card-body">
         </div>
       </div>
     </div>
   </div>
-</div>
 {% endblock %}

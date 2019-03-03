@@ -113,6 +113,10 @@ class Episode:
     end: Union[datetime.datetime, Rational]
     code: str
 
+    @property
+    def playtime(self):
+        return self.end - self.start
+
     def __post_init__(self):
         if isinstance(self.date, str):
             self.date = datetime.datetime.strptime(self.date, util.DATE_FMT).date()

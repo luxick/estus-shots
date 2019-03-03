@@ -8,6 +8,7 @@ from flask_bootstrap import Bootstrap
 import db
 import forms
 import models
+import util
 from config import Config
 
 
@@ -25,6 +26,22 @@ def create_app():
 app = create_app()
 
 app.config.from_object(Config)
+
+
+@app.template_filter("format_time")
+def format_time(value):
+    """Make the datetime to time string formatting available to jinja2"""
+    if value is None:
+        return ""
+    return util.datetime_time_str(value)
+
+
+@app.template_filter("format_timedelta")
+def format_timedelta(value):
+    """Make formatting for timedeltas available to jinja2"""
+    if value is None:
+        return ""
+    return util.timedelta_to_str(value)
 
 
 @app.cli.command("initdb")
@@ -188,10 +205,15 @@ def episode_detail(season_id: int, episode_id: int):
     episode = db.query_db(sql, args, one=True, cls=models.Episode)
     sql, args = db.load_episode_players(episode_id)
     ep_players = db.query_db(sql, args, cls=models.Player)
+
+    events = {"entries": [], "victory_count": 0, "defeat_count": 0}
+
     model = {
         "title": f"{season.code}{episode.code}",
         "episode": episode,
-        "players": ep_players
+        "season": season,
+        "players": ep_players,
+        "events": events,
     }
 
     return render_template("episode_details.html", model=model)
@@ -289,7 +311,13 @@ def episode_edit(season_id: int, episode_id: int):
         return redirect(url_for("season_overview", season_id=season_id))
 
 
-@app.route("/players/new")
+@app.route("/seasons/<season_id>/episodes/<episode_id>/events/new", methods=["GET"])
+@authorize
+def event_new(season_id: int, episode_id: int):
+    pass
+
+
+@app.route("/players/new", methods=["GET"])
 @authorize
 def player_new():
     form = forms.PlayerForm()
