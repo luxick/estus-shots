@@ -5,7 +5,9 @@
 {% block page %}
   {% if g.is_editor %}
     <div class="btn-toolbar" role="toolbar">
-      <a class="btn btn-primary" href="{{ url_for('new_drink') }}" role="button"><span class="fas fa-plus"></span> Drink</a>
+      <a class="btn btn-primary" href="{{ url_for('new_drink') }}" role="button">
+        <span class="fas fa-plus"></span> Drink
+      </a>
     </div>
   {% endif %}
 {% if not model.drinks %}

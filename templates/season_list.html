@@ -35,7 +35,8 @@
             {% endfor %}
 
               <td class="col-sm-auto text-center">
-                <a class="btn btn-default" href="/seasons/{{ item.id }}"><span class="fas fa-eye"></span></a>
+                <a class="btn btn-default" href="{{ url_for("season_overview", season_id = item.id) }}">
+                  <span class="fas fa-eye"></span></a>
               </td>
 
             {% if g.is_editor %}

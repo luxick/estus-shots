@@ -104,10 +104,10 @@ def logout():
 @app.route("/")
 @authorize
 def landing():
-    return redirect("/seasons")
+    return redirect("/season")
 
 
-@app.route("/seasons")
+@app.route("/season")
 @authorize
 def season_list():
     sql, args = db.load_season()
@@ -125,25 +125,25 @@ def season_list():
     return render_template("season_list.html", model=model)
 
 
-@app.route("/seasons/new", methods=["GET"])
+@app.route("/season/new", methods=["GET"])
 @authorize
 def season_new():
     form = forms.SeasonForm()
     model = models.GenericFormModel(
         page_title="New Season",
         form_title="Create New Season",
-        post_url="/seasons/edit/null",
+        post_url="/season/edit/null",
     )
     return render_template("generic_form.html", model=model, form=form)
 
 
-@app.route("/seasons/edit/<season_id>", methods=["GET", "POST"])
+@app.route("/season/edit/<season_id>", methods=["GET", "POST"])
 @authorize
 def season_edit(season_id: int):
     model = models.GenericFormModel(
         page_title="Seasons",
         form_title="Edit Season",
-        post_url=f"/seasons/edit/{season_id}",
+        post_url=f"/season/edit/{season_id}",
     )
 
     if request.method == "GET":
@@ -173,7 +173,7 @@ def season_edit(season_id: int):
         return redirect(url_for("season_list"))
 
 
-@app.route("/seasons/<season_id>", methods=["GET"])
+@app.route("/season/<season_id>", methods=["GET"])
 @authorize
 def season_overview(season_id: int):
     sql, args = db.load_season(season_id)
@@ -196,7 +196,7 @@ def season_overview(season_id: int):
     return render_template("season_overview.html", model=model)
 
 
-@app.route("/seasons/<season_id>/episodes/<episode_id>")
+@app.route("/season/<season_id>/episode/<episode_id>")
 @authorize
 def episode_detail(season_id: int, episode_id: int):
     sql, args = db.load_season(season_id)
@@ -219,7 +219,7 @@ def episode_detail(season_id: int, episode_id: int):
     return render_template("episode_details.html", model=model)
 
 
-@app.route("/seasons/<season_id>/episodes", methods=["GET"])
+@app.route("/season/<season_id>/episode", methods=["GET"])
 @authorize
 def episode_list(season_id: int):
     sql, args = db.load_season(season_id)
@@ -231,13 +231,13 @@ def episode_list(season_id: int):
     return render_template("episode_list.html", model=model)
 
 
-@app.route("/seasons/<season_id>/episodes/new", methods=["GET"])
+@app.route("/season/<season_id>/episode/new", methods=["GET"])
 @authorize
 def episode_new(season_id: int):
     model = models.GenericFormModel(
         page_title="New Episode",
         form_title="Create New Episode",
-        post_url=f"/seasons/{season_id}/episodes/edit/null",
+        post_url=f"/season/{season_id}/episode/null/edit",
     )
 
     form = forms.EpisodeForm(request.form)
@@ -245,13 +245,13 @@ def episode_new(season_id: int):
     return render_template("generic_form.html", model=model, form=form)
 
 
-@app.route("/seasons/<season_id>/episodes/<episode_id>/edit", methods=["GET", "POST"])
+@app.route("/season/<season_id>/episode/<episode_id>/edit", methods=["GET", "POST"])
 @authorize
 def episode_edit(season_id: int, episode_id: int):
     model = models.GenericFormModel(
         page_title="Edit Episode",
         form_title="Edit Episode",
-        post_url=f"/seasons/{season_id}/episodes/{episode_id}/edit",
+        post_url=f"/season/{season_id}/episode/{episode_id}/edit",
     )
 
     if request.method == "GET":
@@ -311,28 +311,27 @@ def episode_edit(season_id: int, episode_id: int):
         return redirect(url_for("season_overview", season_id=season_id))
 
 
-@app.route("/seasons/<season_id>/episodes/<episode_id>/events/new", methods=["GET"])
+@app.route("/season/<s_id>/episode/<ep_id>/event/new", methods=["GET"])
 @authorize
-def event_new(season_id: int, episode_id: int):
+def event_new(s_id: int, ep_id: int):
     model = {
         "page_title": "New Event",
         "form_title": "Create New Event",
-        "post_url": f"/seasons/{season_id}/episodes/{episode_id}/events/null/edit",
+        "post_url": f"/seasons/{s_id}/episodes/{ep_id}/events/null/edit",
     }
 
     return render_template("event_editor.html", model=model)
 
 
 @app.route(
-    "/seasons/<season_id>/episodes/<episode_id>/events/<event_id>/edit",
-    methods=["GET", "POST"],
+    "/season/<s_id>/episode/<ep_id>/event/<ev_id>/edit", methods=["GET", "POST"]
 )
 @authorize
-def event_edit(season_id: int, episode_id: int, event_id: int):
+def event_edit(s_id: int, ep_id: int, ev_id: int):
     model = {
         "page_title": "Edit Event",
         "form_title": "Edit Event",
-        "post_url": f"/seasons/{season_id}/episodes/{episode_id}/events/{event_id}/edit"
+        "post_url": f"/season/{s_id}/episode/{ep_id}/event/{ev_id}/edit",
     }
     if request.method == "GET":
         return render_template("event_editor.html", model=model)
@@ -340,25 +339,25 @@ def event_edit(season_id: int, episode_id: int, event_id: int):
         pass
 
 
-@app.route("/players/new", methods=["GET"])
+@app.route("/player/new", methods=["GET"])
 @authorize
 def player_new():
     form = forms.PlayerForm()
     model = models.GenericFormModel(
         page_title="Players",
         form_title="Create a new Player",
-        post_url="/players/edit/null",
+        post_url="/player/null/edit",
     )
     return render_template("generic_form.html", model=model, form=form)
 
 
-@app.route("/players/edit/<player_id>", methods=["GET", "POST"])
+@app.route("/player/<player_id>/edit", methods=["GET", "POST"])
 @authorize
 def player_edit(player_id: int):
     model = models.GenericFormModel(
         page_title="Players",
         form_title=f"Edit Player",
-        post_url=f"/players/edit/{player_id}",
+        post_url=f"/player/{player_id}/edit",
     )
     # Edit Existing Player
     if request.method == "GET":
@@ -381,13 +380,13 @@ def player_edit(player_id: int):
         if form.validate_on_submit():
             player = models.Player.from_form(form)
             res = db.save_player(player)
-            return redirect("/players")
+            return redirect("/player")
 
         model.form_title = "Incorrect Data"
         return render_template("generic_form.html", model=model, form=form)
 
 
-@app.route("/players")
+@app.route("/player")
 @authorize
 def player_list():
     sql, args = db.load_players()
@@ -404,7 +403,7 @@ def player_list():
     return render_template("player_list.html", model=model)
 
 
-@app.route("/drinks")
+@app.route("/drink")
 @authorize
 def drink_list():
     sql, args = db.load_drinks()
@@ -417,7 +416,7 @@ def drink_list():
     return render_template("drink_list.html", model=model)
 
 
-@app.route("/drinks/<drink_id>/edit", methods=["GET"])
+@app.route("/drink/<drink_id>/edit", methods=["GET"])
 @authorize
 def drink_edit(drink_id: int):
     sql, args = db.load_drinks(drink_id)
@@ -431,13 +430,13 @@ def drink_edit(drink_id: int):
     model = models.GenericFormModel(
         page_title="Edit Drink",
         form_title=f'Edit Drink "{drink.name}"',
-        post_url="/drinks/save",
+        post_url="/drink/save",
     )
 
     return render_template("generic_form.html", model=model, form=form)
 
 
-@app.route("/drinks/new", methods=["GET"])
+@app.route("/drink/new", methods=["GET"])
 @authorize
 def new_drink():
     form = forms.DrinkForm()
@@ -450,22 +449,22 @@ def new_drink():
     return render_template("generic_form.html", model=model, form=form)
 
 
-@app.route("/drinks/save", methods=["POST"])
+@app.route("/drink/save", methods=["POST"])
 @authorize
 def drink_save():
     form = forms.DrinkForm()
     if form.validate_on_submit():
         drink = models.Drink.from_form(form)
         res = db.save_drink(drink)
-        return redirect("/drinks")
+        return redirect("/drink")
 
     model = models.GenericFormModel(
-        page_title="Drinks", form_title="Edit Drink", post_url="/drinks/save"
+        page_title="Drinks", form_title="Edit Drink", post_url="/drink/save"
     )
     return render_template("generic_form.html", model=model, form=form)
 
 
-@app.route("/enemies")
+@app.route("/enemy")
 @authorize
 def enemy_list():
     sql, args = db.load_enemies()
@@ -474,7 +473,7 @@ def enemy_list():
     return render_template("enemies.html", model=model)
 
 
-@app.route("/enemies/new", methods=["GET"])
+@app.route("/enemy/new", methods=["GET"])
 @authorize
 def enemy_new(preselect_season=None):
     form = forms.EnemyForm()
@@ -485,18 +484,18 @@ def enemy_new(preselect_season=None):
     model = models.GenericFormModel(
         page_title="Enemies",
         form_title="Create a new Enemy",
-        post_url=f"/enemies/edit/null",
+        post_url=f"/enemy/null/edit",
     )
     return render_template("generic_form.html", model=model, form=form)
 
 
-@app.route("/enemies/edit/<enemy_id>", methods=["GET", "POST"])
+@app.route("/enemy/<enemy_id>/edit", methods=["GET", "POST"])
 @authorize
 def enemy_edit(enemy_id: int):
     model = models.GenericFormModel(
         page_title="Enemies",
         form_title="Edit Enemy",
-        post_url=f"/enemies/edit/{enemy_id}",
+        post_url=f"/enemy/{enemy_id}/edit",
     )
 
     if request.method == "GET":
@@ -521,7 +520,7 @@ def enemy_edit(enemy_id: int):
             if form.submit_continue_button.data:
                 form.name.data = None
                 return enemy_new(preselect_season=enemy.season_id)
-            return redirect("/enemies")
+            return redirect("/enemy")
 
         model.form_title = "Incorrect Data"
         return render_template("generic_form.html", model=model, form=form)
