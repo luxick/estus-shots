@@ -314,7 +314,30 @@ def episode_edit(season_id: int, episode_id: int):
 @app.route("/seasons/<season_id>/episodes/<episode_id>/events/new", methods=["GET"])
 @authorize
 def event_new(season_id: int, episode_id: int):
-    pass
+    model = {
+        "page_title": "New Event",
+        "form_title": "Create New Event",
+        "post_url": f"/seasons/{season_id}/episodes/{episode_id}/events/null/edit",
+    }
+
+    return render_template("event_editor.html", model=model)
+
+
+@app.route(
+    "/seasons/<season_id>/episodes/<episode_id>/events/<event_id>/edit",
+    methods=["GET", "POST"],
+)
+@authorize
+def event_edit(season_id: int, episode_id: int, event_id: int):
+    model = {
+        "page_title": "Edit Event",
+        "form_title": "Edit Event",
+        "post_url": f"/seasons/{season_id}/episodes/{episode_id}/events/{event_id}/edit"
+    }
+    if request.method == "GET":
+        return render_template("event_editor.html", model=model)
+    else:
+        pass
 
 
 @app.route("/players/new", methods=["GET"])
