@@ -8,6 +8,7 @@ from wtforms import (
     DecimalField,
     SelectField,
     SelectMultipleField,
+    HiddenField
 )
 from wtforms.validators import DataRequired, Optional
 
@@ -15,7 +16,7 @@ import choices
 
 
 class SeasonForm(FlaskForm):
-    season_id = StringField("Season ID", render_kw={"readonly": True})
+    season_id = HiddenField("Season ID", render_kw={"readonly": True})
     code = StringField("Season Code", validators=[DataRequired()])
     game_name = StringField("Game Name", validators=[DataRequired()])
     description = StringField("Season Description")
@@ -25,8 +26,8 @@ class SeasonForm(FlaskForm):
 
 
 class EpisodeForm(FlaskForm):
-    season_id = StringField("Season ID", render_kw={"readonly": True})
-    episode_id = StringField("Episode ID", render_kw={"readonly": True})
+    season_id = HiddenField("Season ID", render_kw={"readonly": True})
+    episode_id = HiddenField("Episode ID", render_kw={"readonly": True})
     code = StringField("Episode Code", validators=[DataRequired()])
     title = StringField("Title", validators=[DataRequired()])
     date = DateField("Episode Date", format="%Y-%m-%d", validators=[DataRequired()])
@@ -39,7 +40,7 @@ class EpisodeForm(FlaskForm):
 
 
 class PlayerForm(FlaskForm):
-    player_id = StringField("Player ID", render_kw={"readonly": True})
+    player_id = HiddenField("Player ID", render_kw={"readonly": True})
     real_name = StringField("Real Name")
     alias = StringField("Player Alias", validators=[DataRequired()])
     hex_id = StringField("Hex ID")
@@ -48,15 +49,14 @@ class PlayerForm(FlaskForm):
 
 
 class DrinkForm(FlaskForm):
-    drink_id = StringField("Drink ID", render_kw={"readonly": True})
+    drink_id = HiddenField("Drink ID", render_kw={"readonly": True})
     name = StringField("Name", validators=[DataRequired()])
     vol = DecimalField("Alcohol %", validators=[DataRequired()])
     submit_button = SubmitField("Submit")
 
 
 class EnemyForm(FlaskForm):
-
-    enemy_id = StringField("Enemy ID", render_kw={"readonly": True})
+    enemy_id = HiddenField("Enemy ID", render_kw={"readonly": True})
     season_id = SelectField(
         "Season", choices=choices.SeasonChoicesIterable(), coerce=int
     )
