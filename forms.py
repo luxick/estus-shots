@@ -58,7 +58,7 @@ class DrinkForm(FlaskForm):
 class EnemyForm(FlaskForm):
     enemy_id = HiddenField("Enemy ID", render_kw={"readonly": True})
     season_id = SelectField(
-        "Season", choices=choices.SeasonChoicesIterable(), coerce=int
+        "Season", choices=choices.SeasonChoiceIterable(), coerce=int
     )
     name = StringField("Name", validators=[DataRequired()])
     is_boss = BooleanField("Is Boss")
