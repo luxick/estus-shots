@@ -1,13 +1,17 @@
-import models
-import db
+from estusshots import orm, models, db
+from estusshots.orm import Season
+
+
+def event_choices():
+    return [(member.value, member.name) for member in models.EventType]
 
 
 def season_choices():
     """ Query the database for available seasons.
     This returns a list of tuples with the season ID and a display string.
     """
-    sql, args = db.load_season()
-    seasons = db.query_db(sql, args, cls=models.Season)
+    db = orm.new_session()
+    seasons = db.query(Season).order_by(Season.code).all()
     choices = [(s.id, f"{s.code}: {s.game}") for s in seasons]
     choices.insert(0, (-1, "No Season"))
     return choices
@@ -31,6 +35,15 @@ def drink_choice():
     choices = [(d.id, d.name) for d in drinks]
     choices.insert(0, (-1, "None"))
     return choices
+
+
+def enemy_choice_for_season(season_id: int):
+    """
+    Query database for all available enemies in this season
+    """
+    sql, args = db.load_enemies_for_season(season_id)
+    enemies = db.query_db(sql, args, cls=models.Enemy)
+    return [(e.id, e.name) for e in enemies]
 
 
 class IterableBase:
@@ -60,3 +73,8 @@ class PlayerChoiceIterable(IterableBase):
 class DrinkChoiceIterable(IterableBase):
     def __init__(self):
         self._loader = drink_choice
+
+
+class EventChoiceIterable(IterableBase):
+    def __init__(self):
+        self._loader = event_choices

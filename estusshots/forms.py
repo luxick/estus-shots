@@ -8,11 +8,13 @@ from wtforms import (
     DecimalField,
     SelectField,
     SelectMultipleField,
-    HiddenField
+    HiddenField,
+    FieldList,
+    FormField,
 )
 from wtforms.validators import DataRequired, Optional
 
-import choices
+from estusshots import choices
 
 
 class SeasonForm(FlaskForm):
@@ -64,3 +66,25 @@ class EnemyForm(FlaskForm):
     is_boss = BooleanField("Is Boss")
     submit_button = SubmitField("Submit")
     submit_continue_button = SubmitField("Submit and Continue")
+
+
+class PenaltyFrom(FlaskForm):
+    penalty_id = HiddenField("Penalty ID")
+    player_id = HiddenField("Player ID")
+    player = HiddenField("Player")
+    drink = SelectField("Drink", choices=choices.DrinkChoiceIterable(), coerce=int)
+
+
+class EventForm(FlaskForm):
+    event_id = HiddenField("Event ID")
+    episode_id = HiddenField("Episode ID")
+    event_type = SelectField(
+        "Type", choices=choices.EventChoiceIterable(), coerce=int,
+        validators=[DataRequired()]
+    )
+    time = TimeField("Time", format="%H:%M", validators=[DataRequired()])
+    player = SelectField("Player", choices=choices.PlayerChoiceIterable(), coerce=int)
+    enemy = SelectField("Enemy", coerce=int)
+    comment = StringField("Comment")
+    penalties = FieldList(FormField(PenaltyFrom))
+    submit_button = SubmitField("Submit")

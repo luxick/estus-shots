@@ -16,8 +16,8 @@
       <table class="table table-hover table-striped table-bordered">
         <thead>
           <tr>
-            <th scope="col" class="col-sm-auto text-center">ID</th>
             <th scope="col" class="col-sm-auto text-center">Name</th>
+            <th scope="col" class="col-sm-auto text-center">Season</th>
             <th scope="col" class="col-sm-auto text-center">Boss Enemy</th>
 
             {% if g.is_editor %}
@@ -26,19 +26,19 @@
           </tr>
         </thead>
         <tbody>
-          {% for item in model.enemies %}
+          {% for enemy in model.enemies %}
           <tr>
-            <td class="col-sm-auto text-center">{{ item.id }}</td>
-            <td class="col-sm-auto text-center">{{ item.name }}</td>
+            <td class="col-sm-auto text-center">{{ enemy.name }}</td>
+            <td class="col-sm-auto text-center">{{ enemy.season.game }}</td>
             <td class="col-sm-auto text-center">
-              {% if item.boss %}
+              {% if enemy.boss %}
                 <span class="fas fa-check"></span>
               {% endif %}
             </td>
 
             {% if g.is_editor %}
               <td class="col-sm-auto text-center">
-                <a class="btn btn-default" href="{{ url_for('enemy_edit', enemy_id = item.id) }}">
+                <a class="btn btn-default" href="{{ url_for('enemy_edit', enemy_id = enemy.id) }}">
                   <span class="fas fa-pencil-alt"></span>
                 </a>
               </td>

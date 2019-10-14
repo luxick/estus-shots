@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% set active_page = "seasons" %}
+{% block title %}{{ model.page_title }} {{ super() }}{% endblock %}
+
+{% block page %}
+  <div class="text-center">
+    <h1>{{ model.form_title }}</h1>
+
+    {% if model.errors %}
+      <div class="alert alert-danger">
+      {% for field, errors in model.errors.items() %}
+        <div>
+          <strong class="text-capitalize">{{ field }}</strong>:
+          {{ errors|join(', ') }}
+        </div>
+      {% endfor %}
+      </div>
+    {% endif %}
+
+    <form action="{{ model.post_url }}" method="post">
+
+      {{ form.hidden_tag() }}
+
+      <div class="form-group row required">
+        <div class="col-lg-2">
+          {{ form.event_type.label(class_="form-control-label") }}
+        </div>
+        <div class="col-lg-10">
+          {{ form.event_type(class_="form-control") }}
+        </div>
+      </div>
+
+      <div class="form-group row required">
+        <div class="col-lg-2">
+          {{ form.time.label(class_="form-control-label") }}
+        </div>
+        <div class="col-lg-10 row">
+          <div class="col">
+            {{ form.time(class_="form-control") }}
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-default btn-block"
+                    onclick="editorModule.setCurrentTime('time')">Now</button>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="form-group row required">
+        <div class="col-lg-2">
+          {{ form.player.label(class_="form-control-label") }}
+        </div>
+        <div class="col-lg-10">
+          {{ form.player(class_="form-control") }}
+        </div>
+      </div>
+
+      <div class="form-group row required">
+        <div class="col-lg-2">
+          {{ form.enemy.label(class_="form-control-label") }}
+        </div>
+        <div class="col-lg-10">
+          {{ form.enemy(class_="form-control") }}
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <div class="col-lg-2">
+          {{ form.comment.label(class_="form-control-label") }}
+        </div>
+        <div class="col-lg-10">
+          {{ form.comment(class_="form-control") }}
+        </div>
+      </div>
+
+      <div class="penalty-container">
+        {% for penalty in form.penalties %}
+          {{ penalty.hidden_tag() }}
+          <div class="penalty-item">
+            {{ penalty.penalty_id }}
+            {{ penalty.player_id }}
+            {{ penalty.player }}
+            <label class="form-control-label">{{ penalty.player.data }}</label>
+            {{ penalty.drink }}
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="offset-lg-2 col-lg-10">
+        {{ form.submit_button(class_="btn btn-primary") }}
+      </div>
+    </form>
+  </div>
+{% endblock %}

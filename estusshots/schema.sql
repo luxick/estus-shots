@@ -87,7 +87,47 @@ create table if not exists episode_player
 		references player
 );
 
-create unique index if not exists episode_player_link_id_uindex
-	on episode_player (link_id);
+create table if not exists penalty
+(
+	id integer not null
+		constraint penalty_pk
+			primary key autoincrement,
+	episode_id integer not null
+		references episode,
+	drink_id integer not null
+		references drink
 
+);
+create unique index if not exists penalty_id_uindex
+	on penalty (id);
 
+create table if not exists event
+(
+	id integer not null
+		constraint event_pk
+			primary key autoincrement,
+	episode_id integer not null
+		constraint event_episode_id_fk
+			references season,
+	player_id integer not null
+	    constraint event_player_id_fk
+			references player,
+	enemy_id integer
+			references enemy,
+	type text not null,
+	time timestamp not null,
+	comment text
+);
+create unique index if not exists event_id_uindex
+	on event (id);
+
+create table if not exists event_penalty
+(
+	link_id integer not null
+		constraint event_punishment_pk
+			primary key autoincrement,
+	event_id integer not null
+		references event,
+	punishment_id integer not null
+		references punishment
+);

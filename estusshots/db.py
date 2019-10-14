@@ -4,8 +4,8 @@ from typing import Sequence
 
 from flask import g
 
-import models
-from config import Config
+from estusshots import models
+from estusshots.config import config
 
 
 class DataBaseError(Exception):
@@ -16,8 +16,8 @@ def connect_db():
     """Create a new sqlite3 connection and register it in 'g._database'"""
     db = getattr(g, "_database", None)
     if db is None:
-        log.info(f"Connecting {Config.DATABASE_PATH}")
-        db = g._database = sqlite3.connect(Config.DATABASE_PATH)
+        log.info(f"Connecting {config.DATABASE_PATH}")
+        db = g._database = sqlite3.connect(config.DATABASE_PATH)
 
     db.row_factory = sqlite3.Row
     return db
@@ -119,7 +119,9 @@ def save_drink_query(drink):
         sql = "insert into drink values (?, ?, ?)"
         args = (None, drink.name, drink.vol)
     else:
-        sql = "update drink " "set name=?, vol=? " "where id==?"
+        sql = "update drink " \
+              "set name=?, vol=? " \
+              "where id==?"
         args = (drink.name, drink.vol, drink.id)
     return sql, args
 
@@ -139,12 +141,22 @@ def load_enemies(id=None):
     return sql, args
 
 
+def load_enemies_for_season(season_id: int):
+    sql = "select * from enemy " \
+          "where season_id = ? or season_id = 'None'" \
+          "order by enemy.id"
+    args = (season_id, )
+    return sql, args
+
+
 def save_enemy(enemy: models.Enemy):
     if not enemy.id:
         sql = "insert into enemy values (?, ?, ?, ?)"
         args = (None, enemy.name, enemy.boss, enemy.season_id)
     else:
-        sql = "update enemy " "set name=?, boss=?, season_id=? " "where id==?"
+        sql = "update enemy " \
+              "set name=?, boss=?, season_id=? " \
+              "where id==?"
         args = (enemy.name, enemy.boss, enemy.season_id, enemy.id)
     return sql, args
 
@@ -214,10 +226,12 @@ def load_episode_player_links(episode_id: int):
 
 
 def load_episode_players(episode_id: int):
-    sql = "select player.* " \
-          "from player " \
-          "left join episode_player ep on player.id = ep.player_id " \
-          "where ep.episode_id = ?"
+    sql = (
+        "select player.* "
+        "from player "
+        "left join episode_player ep on player.id = ep.player_id "
+        "where ep.episode_id = ?"
+    )
     args = (episode_id,)
     return sql, args
 
@@ -229,8 +243,7 @@ def save_episode_players(episode_id: int, player_ids: Sequence[int]):
 
 
 def remove_episode_player(episode_id: int, player_ids: Sequence[int]):
-    sql = "delete from episode_player " \
-          "where episode_id = ? and player_id = ?"
+    sql = "delete from episode_player " "where episode_id = ? and player_id = ?"
     args = tuple((episode_id, pid) for pid in player_ids)
     return sql, args
 
@@ -262,4 +275,32 @@ def save_episode(episode: models.Episode):
             episode.code,
             episode.id,
         )
+    return sql, args
+
+
+def save_event(event: models.Event):
+    args = [
+        None,
+        event.episode_id,
+        event.player_id,
+        event.enemy_id,
+        event.type.name,
+        event.time.timestamp(),
+        event.comment,
+    ]
+    if not event.event_id:
+        sql = "insert into event values (?, ?, ?, ?, ?, ?, ?)"
+    else:
+        sql = (
+            "where id==? "
+            "update event "
+            "set episode_id=?, player_id=?, enemy_id=?, type=?, time=?, comment=?"
+        )
+        args[0] = event.event_id
+    return sql, args
+
+
+def load_events(episode_id: int):
+    sql = "select * from event where episode_id = ?"
+    args = (episode_id,)
     return sql, args

@@ -1,10 +1,18 @@
 import datetime
+import enum
 from numbers import Rational
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Optional
 from dataclasses import dataclass
 
-import forms
-import util
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from estusshots import forms, util
+
+
+class EventType(enum.Enum):
+    Pause = 0
+    Death = 1
+    Victory = 2
 
 
 @dataclass
@@ -28,7 +36,7 @@ class Player:
         return self.real_name if self.real_name and not self.anon else self.alias
 
     @classmethod
-    def from_form(cls, form: forms.PlayerForm):
+    def from_form(cls, form: "forms.PlayerForm"):
         id = int(form.player_id.data) if form.player_id.data else None
         real_name = str(form.real_name.data) if form.real_name.data else None
         alias = str(form.alias.data)
@@ -44,7 +52,7 @@ class Drink:
     vol: float
 
     @classmethod
-    def from_form(cls, form: forms.DrinkForm):
+    def from_form(cls, form: "forms.DrinkForm"):
         id = int(form.drink_id.data) if form.drink_id.data else None
         name = str(form.name.data)
         vol = float(form.vol.data)
@@ -61,7 +69,7 @@ class Enemy:
     season_id: int
 
     @classmethod
-    def from_form(cls, form: forms.EnemyForm):
+    def from_form(cls, form: "forms.EnemyForm"):
         id = int(form.enemy_id.data) if form.enemy_id.data else None
         name = str(form.name.data)
         boss = bool(form.is_boss.data)
@@ -91,7 +99,7 @@ class Season:
             pass
 
     @classmethod
-    def from_form(cls, form: forms.SeasonForm):
+    def from_form(cls, form: "forms.SeasonForm"):
         season_id = int(form.season_id.data) if form.season_id.data else None
         code = str(form.code.data)
         game = str(form.game_name.data)
@@ -126,7 +134,7 @@ class Episode:
             self.end = datetime.datetime.fromtimestamp(self.end)
 
     @classmethod
-    def from_form(cls, form: forms.EpisodeForm):
+    def from_form(cls, form: "forms.EpisodeForm"):
         episode_id = int(form.episode_id.data) if form.episode_id.data else None
         season_id = int(form.season_id.data)
         code = str(form.code.data)
@@ -139,3 +147,43 @@ class Episode:
             end = end + datetime.timedelta(days=1)
 
         return cls(episode_id, season_id, title, date, start, end, code)
+
+
+@dataclass
+class Penalty:
+    penalty_id: int
+    player_id: int
+    drink_id: int
+
+
+@dataclass
+class Event:
+    event_id: int
+    episode_id: int
+    type: EventType
+    time: datetime.datetime
+    comment: str
+    player_id: Optional[int]
+    enemy_id: Optional[int]
+    penalties: List[Penalty]
+
+    @classmethod
+    def from_form(cls, form: "forms.EventForm"):
+        event_id = int(form.event_id.data) if form.event_id.data else None
+        episode_id = int(form.episode_id.data)
+        event_type = EventType(form.event_type.data)
+        time = util.combine_datetime(datetime.datetime.today(), form.time.data)
+        comment = str(form.comment.data) if form.comment.data else None
+        player_id = int(form.player.data) if form.player.data else None
+        enemy_id = int(form.enemy.data) if form.enemy.data else None
+
+        penalties = []
+        for entry in form.penalties:
+            penalties.append(Penalty(
+                penalty_id=int(entry.penalty_id.data) if entry.penalty_id.data else None,
+                player_id=int(entry.player_id.data),
+                drink_id=int(entry.drink.data)
+            ))
+
+        return cls(event_id, episode_id, event_type, time, comment, player_id, enemy_id,
+                   penalties)
