@@ -37,17 +37,19 @@ def timedelta_to_str(data: timedelta) -> str:
     )
 
 
-def timedelta(start: time, end: time) -> float:
-    startDateTime = datetime.combine(date.today(), start)
+def compute_timedelta(start: time, end: time) -> float:
+    if not start or not end:
+        return 0
+    s = datetime.combine(date.today(), start)
     # Check if the the end is still on the same day
     if start.hour > end.hour:
         base = date.today() + timedelta(days=1)
     else:
         base = date.today()
-    endDateTime = datetime.combine(base, end)
-    difference = startDateTime - endDateTime
+    e = datetime.combine(base, end)
+    difference = s - e
     difference_hours = difference.total_seconds() / 3600
-    return difference_hours
+    return abs(difference_hours)
 
 
 def combine_datetime(date: datetime.date, time: datetime.time):

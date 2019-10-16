@@ -34,23 +34,23 @@
                 </li>
                 <li class="list-group-item">
                   <span class="font-weight-bold">Start:</span>
-                  {{ model.episode.start|format_time }}
+                  {{ model.episode.start|format_time or "Not started yet" }}
                 </li>
                 <li class="list-group-item">
                   <span class="font-weight-bold">End:</span>
-                  {{ model.episode.end|format_time }}
+                  {{ model.episode.end|format_time or "Not ended yet"}}
                 </li>
                 <li class="list-group-item">
                   <span class="font-weight-bold">Play Time:</span>
-                  {{ model.episode.playtime }}
+                  {{ model.episode.playtime or 0 }} Hours
                 </li>
                 <li class="list-group-item">
                   <span class="font-weight-bold">Enemies Defeated:</span>
-                  {{ model.events.victory_count }}
+                  {{ 0 }}
                 </li>
                 <li class="list-group-item">
                   <span class="font-weight-bold">Deaths:</span>
-                  {{ model.events.defeat_count }}
+                  {{ model.deaths|length or 0}}
                 </li>
               </ul>
             </div>
@@ -88,46 +88,48 @@
       <!--endregion-->
 
     </div>
+
     <div class="col-sm-6">
 
-      {% if model.events %}
+    <!--region Deaths Card-->
+
       <div class="card">
         <div class="card-header text-center">
-          Event List
+          Deaths
         </div>
         <div class="card-body">
+
+        {% if model.deaths %}
+
            <table class="table table-striped table-bordered">
             <thead>
               <tr>
-                <th scope="col" class="col-sm-auto text-center">Time</th>
-                <th scope="col" class="col-sm-auto text-center">Type</th>
-                <th scope="col" class="col-sm-auto text-center">Player</th>
-                <th scope="col" class="col-sm-auto text-center">Enemy</th>
+                <th scope="col" class="col-xs-auto text-center">Time</th>
+                <th scope="col" class="col-xs text-center">Enemy</th>
+                <th scope="col" class="col-xs text-center">Player</th>
               </tr>
             </thead>
             <tbody>
-              {% for entry in model.events.entries %}
+              {% for entry in model.deaths %}
               <tr>
-                  <td class="col-sm-auto text-center">{{ entry.time }}</td>
-                  <td class="col-sm-auto text-center">{{ entry.type.name }}</td>
-                  <td class="col-sm-auto text-center">{{ entry.type.player_name }}</td>
-                  <td class="col-sm-auto text-center">{{ entry.type.enemy_name }}</td>
+                  <td class="col-xs-auto text-center">{{ entry.time|format_time }}</td>
+                  <td class="col-xs text-center">{{ entry.enemy.name }}</td>
+                  <td class="col-xs text-center">{{ entry.player.name }}</td>
               </tr>
             {% endfor %}
             </tbody>
           </table>
+
+        {% else %}
+
+            <div class="alert alert-info">Nothing did happen yet</div>
+
+        {% endif %}
         </div>
       </div>
-      {% else %}
-      <div class="card">
-        <div class="card-header text-center">
-          Event List
-        </div>
-        <div class="card-body">
-           <div class="alert alert-info">Nothing did happen yet</div>
-        </div>
-      </div>
-      {% endif %}
+
+    <!--endregion-->
+
     </div>
   </div>
 {% endblock %}

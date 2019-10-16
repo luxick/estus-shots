@@ -1,4 +1,6 @@
 import enum
+from typing import Iterable, List
+
 import sqlalchemy
 from sqlalchemy import create_engine, ForeignKey, Table
 from sqlalchemy.ext.declarative import declarative_base
@@ -9,6 +11,13 @@ from estusshots import util, forms
 
 engine = create_engine('sqlite:///../databases/test.db')
 Base = declarative_base()
+
+player_episode = Table(
+    'player_episode',
+    Base.metadata,
+    Column('player_id', ForeignKey('players.id'), primary_key=True),
+    Column('episode_id', ForeignKey('episodes.id'), primary_key=True)
+)
 
 
 class EventType(enum.Enum):
@@ -27,6 +36,7 @@ class Player(Base):
     anon = Column(Boolean, default=False)
 
     events = relationship("Event", back_populates="player")
+    episodes = relationship("Episode", secondary=player_episode, back_populates="players")
 
     @property
     def name(self) -> str:
@@ -61,8 +71,8 @@ class Season(Base):
     start = Column(Date)
     end = Column(Date)
 
-    episodes = relationship("Episode", back_populates="season")
-    enemies = relationship("Enemy", back_populates="season")
+    episodes: Iterable["Episode"] = relationship("Episode", back_populates="season")
+    enemies: Iterable["Enemy"] = relationship("Enemy", back_populates="season")
 
     def populate_from_form(self, form: "forms.SeasonForm"):
         self.code = str(form.code.data)
@@ -82,7 +92,7 @@ class Enemy(Base):
     season_id = Column(Integer, ForeignKey('seasons.id'))
     season = relationship("Season", back_populates="enemies")
 
-    events = relationship('Event', back_populates="enemy")
+    events: Iterable["Event"] = relationship('Event', back_populates="enemy")
 
     def populate_from_form(self, form: "forms.EnemyForm"):
         self.name = str(form.name.data)
@@ -103,18 +113,26 @@ class Episode(Base):
     season_id = Column(Integer, ForeignKey('seasons.id'))
     season = relationship("Season", back_populates="episodes")
 
-    events = relationship('Event', back_populates='episode')
+    events: List["Event"] = relationship('Event', back_populates='episode')
+    players = relationship("Player", secondary=player_episode, back_populates="episodes")
 
     @property
     def playtime(self):
-        return util.timedelta(self.start, self.end)
+        return util.compute_timedelta(self.start, self.end)
+
+    def populate_from_form(self, form: "forms.EpisodeForm"):
+        self.code = str(form.code.data)
+        self.title = str(form.title.data)
+        self.date = form.date.data
+        self.start = form.start.data
+        self.end = form.end.data
 
 
 class Event(Base):
     __tablename__ = 'events'
 
     id = Column(Integer, primary_key=True)
-    type = Column(Enum(EventType))
+    type: EventType = Column(Enum(EventType))
     time = Column(Time)
     comment = Column(String)
 
@@ -127,7 +145,15 @@ class Event(Base):
     enemy_id = Column(Integer, ForeignKey('enemies.id'))
     enemy = relationship('Enemy', back_populates='events')
 
-    penalties = relationship('Penalty', back_populates='event')
+    penalties: List["Penalty"] = relationship('Penalty', back_populates='event')
+
+    def populate_from_form(self, form: "forms.EventForm"):
+        self.episode_id = int(form.episode_id.data)
+        self.type = EventType(form.event_type.data)
+        self.time = form.time.data
+        self.comment = str(form.comment.data) if form.comment.data else None
+        self.player_id = int(form.player.data) if form.player.data else None
+        self.enemy_id = int(form.enemy.data) if form.enemy.data else None
 
 
 class Penalty(Base):

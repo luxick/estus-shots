@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect
+from flask import render_template, request, redirect, url_for
 
 from estusshots import app
 from estusshots import forms, models, orm
@@ -18,11 +18,12 @@ def enemy_list():
 
 @app.route("/enemy/new", methods=["GET"])
 @authorize
-def enemy_new(preselect_season=None):
+def enemy_new():
     form = forms.EnemyForm()
 
-    if preselect_season:
-        form.season_id.default = preselect_season
+    if "preselect" in request.args:
+        form.season_id.process_data(request.args['preselect'])
+        form.is_boss.data = True
 
     model = models.GenericFormModel(
         page_title="Enemies",
@@ -64,9 +65,8 @@ def enemy_edit(enemy_id: int):
             enemy.populate_from_form(form)
             db.commit()
             if form.submit_continue_button.data:
-                form.name.data = None
-                return enemy_new(preselect_season=enemy.season_id)
-            return redirect("/enemy")
+                return redirect(url_for("enemy_new", preselect=form.season_id.data))
+            return redirect(url_for("enemy_list"))
 
         model.form_title = "Incorrect Data"
         return render_template("generic_form.html", model=model, form=form)
