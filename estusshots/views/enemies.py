@@ -1,7 +1,6 @@
 from flask import render_template, request, redirect, url_for
 
-from estusshots import app
-from estusshots import forms, models, orm
+from estusshots import app, forms, orm
 from estusshots.util import authorize
 from estusshots.orm import Enemy
 from sqlalchemy.orm import subqueryload
@@ -25,7 +24,7 @@ def enemy_new():
         form.season_id.process_data(request.args['preselect'])
         form.is_boss.data = True
 
-    model = models.GenericFormModel(
+    model = forms.GenericFormModel(
         page_title="Enemies",
         form_title="Create a new Enemy",
         post_url=f"/enemy/null/edit",
@@ -36,7 +35,7 @@ def enemy_new():
 @app.route("/enemy/<enemy_id>/edit", methods=["GET", "POST"])
 @authorize
 def enemy_edit(enemy_id: int):
-    model = models.GenericFormModel(
+    model = forms.GenericFormModel(
         page_title="Enemies",
         form_title="Edit Enemy",
         post_url=f"/enemy/{enemy_id}/edit",

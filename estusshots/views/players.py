@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect
 
 from estusshots import app
-from estusshots import forms, models, orm
+from estusshots import forms, orm
 from estusshots.util import authorize
 from estusshots.orm import Player
 
@@ -10,7 +10,7 @@ from estusshots.orm import Player
 @authorize
 def player_new():
     form = forms.PlayerForm()
-    model = models.GenericFormModel(
+    model = forms.GenericFormModel(
         page_title="Players",
         form_title="Create a new Player",
         post_url="/player/null/edit",
@@ -21,7 +21,7 @@ def player_new():
 @app.route("/player/<player_id>/edit", methods=["GET", "POST"])
 @authorize
 def player_edit(player_id: int):
-    model = models.GenericFormModel(
+    model = forms.GenericFormModel(
         page_title="Players",
         form_title=f"Edit Player",
         post_url=f"/player/{player_id}/edit",

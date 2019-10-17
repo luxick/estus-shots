@@ -1,7 +1,7 @@
 from flask import render_template, redirect
 
 from estusshots import app
-from estusshots import forms, models, orm
+from estusshots import forms, orm
 from estusshots.util import authorize
 from estusshots.orm import Drink
 
@@ -29,7 +29,7 @@ def drink_edit(drink_id: int):
     form.name.data = drink.name
     form.vol.data = drink.vol
 
-    model = models.GenericFormModel(
+    model = forms.GenericFormModel(
         page_title="Edit Drink",
         form_title=f'Edit Drink "{drink.name}"',
         post_url="/drink/save",
@@ -42,7 +42,7 @@ def drink_edit(drink_id: int):
 @authorize
 def new_drink():
     form = forms.DrinkForm()
-    model = models.GenericFormModel(
+    model = forms.GenericFormModel(
         page_title="New Drink",
         form_title=f"Create a new Drink",
         post_url="/drink/save",
@@ -66,7 +66,7 @@ def drink_save():
         err = db.commit()
         return redirect("/drink")
 
-    model = models.GenericFormModel(
+    model = forms.GenericFormModel(
         page_title="Drinks", form_title="Edit Drink", post_url="/drink/save"
     )
     return render_template("generic_form.html", model=model, form=form)

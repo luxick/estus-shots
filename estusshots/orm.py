@@ -7,9 +7,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Boolean, Float, Enum, Date, Time
 from sqlalchemy.orm import sessionmaker, relationship
 
-from estusshots import util, forms
+from estusshots import util, forms, app
 
-engine = create_engine('sqlite:///../databases/test.db')
+connection = f"sqlite:///{app.config.get('DATABASE_PATH')}"
+engine = create_engine(connection)
 Base = declarative_base()
 
 player_episode = Table(

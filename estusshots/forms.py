@@ -1,3 +1,6 @@
+from typing import Dict, List
+
+from dataclasses import dataclass
 from flask_wtf import FlaskForm
 from wtforms import (
     DateField,
@@ -16,6 +19,13 @@ from wtforms.validators import DataRequired, Optional
 
 from estusshots import choices
 
+
+@dataclass
+class GenericFormModel:
+    page_title: str
+    form_title: str
+    post_url: str
+    errors: Dict[str, List[str]] = None
 
 class SeasonForm(FlaskForm):
     season_id = HiddenField("Season ID", render_kw={"readonly": True})

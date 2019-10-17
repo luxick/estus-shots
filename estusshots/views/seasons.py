@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for
 
 from estusshots import app
-from estusshots import forms, models, orm
+from estusshots import forms, orm
 from estusshots.util import authorize
 from estusshots.orm import Season
 
@@ -28,7 +28,7 @@ def season_list():
 @authorize
 def season_new():
     form = forms.SeasonForm()
-    model = models.GenericFormModel(
+    model = forms.GenericFormModel(
         page_title="New Season",
         form_title="Create New Season",
         post_url="/season/edit/null",

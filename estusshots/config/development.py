@@ -1,0 +1,5 @@
+READ_PW = "123"
+WRITE_PW = "1234"
+SECRET_KEY = "1234"
+DATABASE_PATH = "../databases/test.db"
+LOG_PATH = "../logs/debug.log"

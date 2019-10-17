@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for
 
 from estusshots import app
-from estusshots import forms, models, orm
+from estusshots import forms, orm
 from estusshots.util import authorize
 from estusshots.orm import Season, Episode, Player
 
@@ -37,7 +37,7 @@ def episode_list(season_id: int):
 @app.route("/season/<season_id>/episode/new", methods=["GET"])
 @authorize
 def episode_new(season_id: int):
-    model = models.GenericFormModel(
+    model = forms.GenericFormModel(
         page_title="New Episode",
         form_title="Create New Episode",
         post_url=f"/season/{season_id}/episode/null/edit",
@@ -50,7 +50,7 @@ def episode_new(season_id: int):
 @app.route("/season/<season_id>/episode/<episode_id>/edit", methods=["GET", "POST"])
 @authorize
 def episode_edit(season_id: int, episode_id: int):
-    model = models.GenericFormModel(
+    model = forms.GenericFormModel(
         page_title="Edit Episode",
         form_title="Edit Episode",
         post_url=f"/season/{season_id}/episode/{episode_id}/edit",

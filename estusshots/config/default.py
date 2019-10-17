@@ -1,0 +1,6 @@
+READ_PW = None
+WRITE_PW = None
+SECRET_KEY = None
+DATABASE_PATH = None
+LOG_PATH = None
+

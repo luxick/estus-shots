@@ -3,7 +3,7 @@ from datetime import datetime, time, date, timedelta
 
 from flask import g, session, redirect
 
-from estusshots import config, app, db
+from estusshots import app
 
 TIME_FMT = "%H:%M"
 DATE_FMT = "%Y-%m-%d"
@@ -69,9 +69,9 @@ def combine_datetime(date: datetime.date, time: datetime.time):
 
 def get_user_type(password):
     # TODO password hashing?
-    if password == config.WRITE_PW:
+    if password == app.config.get("WRITE_PW"):
         return "editor"
-    if password == config.READ_PW:
+    if password == app.config.get("READ_PW"):
         return "readonly"
     return False
 
@@ -107,12 +107,6 @@ def format_timedelta(value):
     if value is None:
         return ""
     return timedelta_to_str(value)
-
-
-@app.cli.command("initdb")
-def init_db_command():
-    """Initializes the database."""
-    db.init_db()
 
 
 @app.teardown_appcontext
