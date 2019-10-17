@@ -94,6 +94,10 @@ class Enemy(Base):
 
     events: Iterable["Event"] = relationship('Event', back_populates="enemy")
 
+    @property
+    def is_defeated(self):
+        return any([e for e in self.events if e.type == EventType.Victory])
+
     def populate_from_form(self, form: "forms.EnemyForm"):
         self.name = str(form.name.data)
         self.boss = bool(form.is_boss.data)

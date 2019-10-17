@@ -79,9 +79,7 @@ class EventForm(FlaskForm):
     event_id = HiddenField("Event ID")
     episode_id = HiddenField("Episode ID")
     event_type = SelectField(
-        "Type", choices=choices.EventChoiceIterable(), coerce=int,
-        validators=[DataRequired()]
-    )
+        "Type", choices=choices.EventChoiceIterable(), coerce=int)
     time = TimeField("Time", format="%H:%M", validators=[DataRequired()])
     player = SelectField("Player", choices=choices.PlayerChoiceIterable(), coerce=int)
     enemy = SelectField("Enemy", coerce=int)

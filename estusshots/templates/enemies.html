@@ -19,6 +19,7 @@
             <th scope="col" class="col-sm-auto text-center">Name</th>
             <th scope="col" class="col-sm-auto text-center">Season</th>
             <th scope="col" class="col-sm-auto text-center">Boss Enemy</th>
+            <th scope="col" class="col-sm-auto text-center">Defeated</th>
 
             {% if g.is_editor %}
               <th scope="col" class="col-sm-auto text-center">Editor</th>
@@ -32,7 +33,12 @@
             <td class="col-sm-auto text-center">{{ enemy.season.game }}</td>
             <td class="col-sm-auto text-center">
               {% if enemy.boss %}
-                <span class="fas fa-check"></span>
+                <i class="fas fa-check"></i>
+              {% endif %}
+            </td>
+            <td class="col-sm-auto text-center">
+              {% if enemy.is_defeated %}
+                <i class="fas fa-check"></i>
               {% endif %}
             </td>
 

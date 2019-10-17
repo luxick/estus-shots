@@ -43,10 +43,11 @@ def enemy_choice_for_season(season_id: int):
     """
     db = new_session()
     season: Season = db.query(Season).get(season_id)
+    season_enemies = [enemy for enemy in season.enemies if not enemy.is_defeated]
     global_enemies = db.query(Enemy).filter(Enemy.season_id == -1).all()
     if not season and not global_enemies:
         return []
-    combined = global_enemies + season.enemies
+    combined = global_enemies + season_enemies
     return [(e.id, e.name) for e in combined]
 
 

@@ -3,7 +3,7 @@ from flask import render_template, request, redirect, url_for
 from estusshots import app
 from estusshots import forms, models, orm
 from estusshots.util import authorize
-from estusshots.orm import Season, Episode, Player, Event
+from estusshots.orm import Season, Episode, Player
 
 
 @app.route("/season/<season_id>/episode/<episode_id>")
@@ -12,13 +12,14 @@ def episode_detail(season_id: int, episode_id: int):
     db = orm.new_session()
     episode: Episode = db.query(Episode).get(episode_id)
     deaths = [event for event in episode.events if event.type == orm.EventType.Death]
-
+    victories = [event for event in episode.events if event.type == orm.EventType.Victory]
     model = {
         "title": f"{episode.season.code}{episode.code}",
         "episode": episode,
         "season": episode.season,
         "players": episode.players,
         "deaths": sorted(deaths, key=lambda x: x.time),
+        "victories": sorted(victories, key=lambda x: x.time)
     }
 
     return render_template("episode_details.html", model=model)
