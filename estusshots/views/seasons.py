@@ -39,28 +39,26 @@ def season_new():
 @app.route("/season/edit/<season_id>", methods=["GET", "POST"])
 @authorize
 def season_edit(season_id: int):
-    model = models.GenericFormModel(
+    model = forms.GenericFormModel(
         page_title="Seasons",
         form_title="Edit Season",
         post_url=f"/season/edit/{season_id}",
     )
     db = orm.new_session()
-    season = db.query(Season).filter(Season.id == season_id).first()
+    season = db.query(Season).get(season_id)
+    form = forms.SeasonForm()
 
     if request.method == "GET":
-        form = forms.SeasonForm()
-        form.season_id.data = season.id
-        form.code.data = season.code
-        form.game_name.data = season.game
-        form.description.data = season.description
-        form.start.data = season.start
-        form.end.data = season.end
+        form.season_id.process_data(season.id)
+        form.code.process_data(season.code)
+        form.game_name.process_data(season.game)
+        form.description.process_data(season.description)
+        form.start.process_data(season.start)
+        form.end.process_data(season.end)
 
         model.form_title = f"Edit Season '{season.code}: {season.game}'"
         return render_template("generic_form.html", model=model, form=form)
     else:
-        form = forms.SeasonForm()
-
         if not form.validate_on_submit():
             model.errors = form.errors
             return render_template("generic_form.html", model=model, form=form)
