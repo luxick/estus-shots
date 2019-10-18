@@ -14,10 +14,11 @@
       <table class="table table-hover table-striped table-bordered">
         <thead>
           <tr>
-            {% for prop, caption in model.columns %}
-              <th scope="col" class="col-sm-auto text-center">{{ caption }}</th>
-            {% endfor %}
-
+            <th scope="col" class="col-sm-auto text-center">#</th>
+            <th scope="col" class="col-sm-auto text-center">Game</th>
+            <th scope="col" class="col-sm-auto text-center">Season Description</th>
+            <th scope="col" class="col-sm-auto text-center">Started At</th>
+            <th scope="col" class="col-sm-auto text-center">Ended At</th>
             {# Show #}
             <th scope="col" class="col-sm-auto text-center">View</th>
 
@@ -30,14 +31,16 @@
         <tbody>
           {% for item in model.seasons %}
           <tr>
-            {% for prop, caption in model.columns %}
-              <td class="col-sm-auto text-center">{{ item[prop] }}</td>
-            {% endfor %}
+            <td class="col-sm-auto text-center">{{ item.code }}</td>
+            <td class="col-sm-auto text-center">{{ item.game }}</td>
+            <td class="col-sm-auto text-center">{{ item.description or "No Description" }}</td>
+            <td class="col-sm-auto text-center">{{ item.start }}</td>
+            <td class="col-sm-auto text-center">{{ item.end or "Ongoing" }}</td>
 
-              <td class="col-sm-auto text-center">
-                <a class="btn btn-default" href="{{ url_for("season_overview", season_id = item.id) }}">
-                  <span class="fas fa-eye"></span></a>
-              </td>
+            <td class="col-sm-auto text-center">
+              <a class="btn btn-default" href="{{ url_for("season_overview", season_id = item.id) }}">
+                <span class="fas fa-eye"></span></a>
+            </td>
 
             {% if g.is_editor %}
               <td class="col-sm-auto text-center">

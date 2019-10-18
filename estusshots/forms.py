@@ -27,6 +27,7 @@ class GenericFormModel:
     post_url: str
     errors: Dict[str, List[str]] = None
 
+
 class SeasonForm(FlaskForm):
     season_id = HiddenField("Season ID", render_kw={"readonly": True})
     code = StringField("Season Code", validators=[DataRequired()])

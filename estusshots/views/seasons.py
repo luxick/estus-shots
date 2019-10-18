@@ -12,14 +12,7 @@ def season_list():
     db = orm.new_session()
     seasons = db.query(Season).order_by(Season.code).all()
     model = {
-        "seasons": seasons,
-        "columns": [
-            ("code", "#"),
-            ("game", "Game"),
-            ("description", "Season Description"),
-            ("start", "Started At"),
-            ("end", "Ended At"),
-        ],
+        "seasons": seasons
     }
     return render_template("season_list.html", model=model)
 
