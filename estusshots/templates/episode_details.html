@@ -42,7 +42,7 @@
                 </li>
                 <li class="list-group-item">
                   <span class="font-weight-bold">Play Time:</span>
-                  {{ model.episode.playtime or 0 }} Hours
+                  {{ '%0.2f'|format(model.episode.playtime|float) or 0 }} Hours
                 </li>
                 <li class="list-group-item">
                   <span class="font-weight-bold">Enemies Defeated:</span>
