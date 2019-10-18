@@ -26,27 +26,26 @@ def player_edit(player_id: int):
         form_title=f"Edit Player",
         post_url=f"/player/{player_id}/edit",
     )
+    db = orm.new_session()
+    player = db.query(Player).filter(Player.id == player_id).first()
+    form = forms.PlayerForm()
+
     # Edit Existing Player
     if request.method == "GET":
-        db = orm.new_session()
-        player = db.query(Player).filter(Player.id == player_id).first()
-
-        form = forms.PlayerForm()
         form.player_id.data = player.id
         form.anonymize.data = player.anon
         form.real_name.data = player.real_name
         form.alias.data = player.alias
         form.hex_id.data = player.hex_id
-
         model.form_title = f'Edit Player "{player.name}"'
         return render_template("generic_form.html", model=model, form=form)
-
     # Save POSTed data
     else:
         form = forms.PlayerForm()
         if form.validate_on_submit():
-            db = orm.new_session()
-            player = db.query(Player).filter(Player.id == player_id).first()
+            if not player:
+                player = Player()
+                db.add(player)
             player.populate_from_form(form)
             db.commit()
             return redirect("/player")

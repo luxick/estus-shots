@@ -60,6 +60,7 @@ def event_new(s_id: int, ep_id: int):
     form = forms.EventForm()
     form.episode_id.data = ep_id
     form.enemy.choices = choices.enemy_choice_for_season(s_id)
+    form.player.choices = choices.player_choice_for_episode(episode)
     form.event_type.data = EventType.Death.value
 
     Penalty = namedtuple("Penalty", ["penalty_id", "player_id", "player", "drink"])

@@ -1,4 +1,4 @@
-from estusshots.orm import new_session, EventType, Season, Player, Drink, Enemy
+from estusshots.orm import new_session, EventType, Season, Player, Drink, Enemy, Episode
 
 
 def event_choices():
@@ -24,6 +24,13 @@ def player_choice():
     db = new_session()
     players = sorted(db.query(Player).all(), key=lambda x: x.name)
     return [(p.id, p.name) for p in players]
+
+
+def player_choice_for_episode(episode: Episode):
+    """
+    Create a list of ids and names for players of this episode
+    """
+    return [(p.id, p.name) for p in episode.players]
 
 
 def drink_choice():

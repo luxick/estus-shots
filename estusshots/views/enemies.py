@@ -40,24 +40,20 @@ def enemy_edit(enemy_id: int):
         form_title="Edit Enemy",
         post_url=f"/enemy/{enemy_id}/edit",
     )
+    db = orm.new_session()
+    enemy = db.query(Enemy).get(enemy_id)
+    form = forms.EnemyForm()
 
     if request.method == "GET":
-        db = orm.new_session()
-        enemy = db.query(Enemy).filter(Enemy.id == enemy_id).first()
-
-        form = forms.EnemyForm()
         form.season_id.data = enemy.season_id if enemy.season_id else -1
         form.name.data = enemy.name
         form.is_boss.data = enemy.boss
         form.enemy_id.data = enemy_id
-
         model.form_title = f'Edit Enemy "{enemy.name}"'
         return render_template("generic_form.html", model=model, form=form)
     else:
         form = forms.EnemyForm()
         if form.validate_on_submit():
-            db = orm.new_session()
-            enemy = db.query(Enemy).filter(Enemy.id == enemy_id).first()
             if not enemy:
                 enemy = Enemy()
                 db.add(enemy)

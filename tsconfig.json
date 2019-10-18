@@ -4,10 +4,9 @@
         "noImplicitAny": true,
         "removeComments": true,
         "preserveConstEnums": true,
-        "sourceMap": true,
-        "outDir": "./estusshots/static/js"
+        "sourceMap": true
     },
     "include": [
         "**/*.ts"
-    ],
+    ]
 }

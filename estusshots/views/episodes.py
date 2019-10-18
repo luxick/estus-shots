@@ -86,4 +86,4 @@ def episode_edit(season_id: int, episode_id: int):
         if errors:
             model.errors = {"Error saving episode": [errors]}
             return render_template("generic_form.html", model=model, form=form)
-        return redirect(url_for("episode_detail", season_id=season_id, episode_id=episode_id))
+        return redirect(url_for("episode_detail", season_id=season.id, episode_id=episode.id))
