@@ -2,7 +2,7 @@ from flask import render_template, request, redirect, url_for
 
 from estusshots import app
 from estusshots import forms, orm
-from estusshots.util import authorize
+from estusshots.util import authorize, by_time
 from estusshots.orm import Season, Episode, Player
 
 
@@ -18,8 +18,8 @@ def episode_detail(season_id: int, episode_id: int):
         "episode": episode,
         "season": episode.season,
         "players": episode.players,
-        "deaths": sorted(deaths, key=lambda x: x.time),
-        "victories": sorted(victories, key=lambda x: x.time)
+        "deaths": sorted(deaths, key=by_time),
+        "victories": sorted(victories, key=by_time)
     }
 
     return render_template("episode_details.html", model=model)

@@ -37,6 +37,19 @@ def timedelta_to_str(data: timedelta) -> str:
     )
 
 
+def by_time(e):
+    """
+    Custom sort key for sorting by time codes in the format HH:MM
+    This version sorts codes with hour '00' after '23'
+    """
+    if not hasattr(e, "time") or isinstance(e.time, time):
+        return id(e)
+
+    if e.time.hour == 0:
+        return f"24{e.time.minute}"
+    return f"{e.time.hour}{e.time.minute}"
+
+
 def compute_timedelta(start: time, end: time) -> float:
     if not start or not end:
         return 0
